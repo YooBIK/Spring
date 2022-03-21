@@ -1,0 +1,46 @@
+새로운 할인 정책을 개발 + 적용
+
+고정 할인 -> 정률 할인
+
+객체지향 설계 원칙을 잘 준수했는지 확인
+DiscountPolicy 인터페이스 -> (원래)FixedDiscountPolicy 구현체
+		         -> (새로운) RateDiscountPolicy 구현체
+
+TIP: Assertion부분을 alt+ enter 해서 static import해서 사용하면 더 편하다.
+
+역할과 구현을 분리해서 설계? True
+다형성 활용, 인터페이스와 구현 객체를 분리? True
+하지만, OCP, DIP 같은 객체지향 설계 원칙을 준수하지 못함.
+
+Why?
+할인 정책을 변경하려면 클라이언트(할인 정책을 사용하는 클래스)인 
+OrderServiceImpl의 코드를 변경해야 한다. // OCP 위반
+
+OrderServiceImpl은 인터페이스인 DiscountPolicy 뿐만 아니라 
+구체 클래스인 FixDiscountPolicy,RateDiscountPolicy 도 의존한다. // DIP 위반
+
+해결 방법 ?
+DIP를 충족하려면 인터페이스에만 의존해야 한다.
+private final DiscountPolicy discountPolicy = new RateDiscountPolicy(); 를 아래로 수정
+private DiscountPolicy discountPolicy ;
+
+인터페이스만 의존하게 변경, 근데 구현체가 없는데 실행이 되나? 안된다.
+이 문제를 해결하려면 누군가 클라이언트인 OrderServiceImpl에 
+DiscountPolicy의 구현 객체를 대신 생성하고 주입해줘야함.
+
+1.각 구현체는 다른 인터페이스를 의존하게 한다. 
+2.AppConfig에서 실제 동작에 필요한 구현 객체를 생성한다.
+3.AppConfig에서 생성한 구현 객체를 각 구현체들의 생성자를 통해 주입 시킨다.
+
+이 과정을 통해 각 구현체들은 다른 구현체들에 의존하지 않고, 
+외부의 AppConfig에 의해서 어떤 구현 객체가 들어올지 정해진다. // DIP 준수
+
+정리하면, MemberServiceImpl은 MemberRepository(인터페이스)만 의존하고,
+OrderServiceImpl은 MemberRepository(인터페이스)와 DiscountPolicy(인터페이스)만 의존하면 된다.
+MemberRepository(인터페이스)와 DiscountPolicy(인터페이스)의 구현체가 무엇인지는 
+AppConfig가 생성하고 MemberServiceImpl과 OrderServiceImpl를 생성하면서 
+생성자를 통해 참조를 넘겨주며 주입시켜 준다. //Dependency Injection 의존관계 주입이라고 한다.
+
+테스트를 진행하는 방식도 바꾼다. 
+AppConfig를 통해 테스트하는 인터페이스의 구현체를 생성한다.
+TIP : @BeforeEach 를 사용하면 테스트 마다 그 구문을 먼저 실행해서 테스트한다.

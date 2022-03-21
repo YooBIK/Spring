@@ -1,0 +1,157 @@
+프로젝트 생성
+start.spring.io
+Gradle, java, 최신버젼으로 선택, 
+dependecies : 어떤 라이브러리가 필요한지 ?
+spring web, thymeleaf 추가하고 generate
+이후 압축 풀고 build.gradle 인텔리제이로 열기
+라이브러리 살펴보기
+스프링은 라이브러리 떙겨올때 내가 추가한거 말고도 의존관계에 있는 
+다른 라이브러리도 자동으로 댕겨온다.
+로그는 system.out.println()으로 출력하면 안된다 실무에서는 로깅을 쓰자
+logback slf4j를 요즘은 표준으로 보고 많이쓴다. 구글링해보자
+
+ 
+
+View 환경설정
+src.main.resources.static.index.html을 생성 후 작성
+그럼 welcome page 생성!
+스프링은 제공하는게 ㅈㄴ 많아서 외우기보다 spring.io가서 서칭해라
+
+빌드하고 실행하기
+폴더 경로에 cmd쳐서 명령프롬프트 키고
+gradlew -> gradlew build -> cd build -> cd libs -> dir
+-> java -jar 폴더명-0.0.1~뭐이런식-SNAPSHOT.jar
+
+스프링 웹 개발 기초
+정적 컨텐츠
+
+정적 컨텐츠 : 스프링에서는 main -> resource -> static에 파일을 
+그냥 작성하고 그걸 localhost:8080/파일명.html 로가면 그냥 그대로 뜬다. 
+뭐 바뀌는거 없이 말그대로 정적 
+
+
+url을 입력하면 내장 톰캣 서버는 spring에 이거 뭐임 ? 하고물어보는데 
+해당 컨트롤러(예시 : localhost:8080/hello-static.html이면 hello-static 관련 컨트롤러)가 없으면 
+리소스폴더?의 static부분에서 찾아봄 거기서 그 이름을 가진게 있으면 그걸 그냥 띄움
+
+MVC와 템플릿 엔진
+MVC : Model View Controller
+요즘은 비지니스 로직, 서버 관련된거를 컨트롤러를 통해 작성하고 
+모델을 통해 뷰에 넘겨주는 방식을 사용함
+
+localhost:8080/hello-mvc 하면, 내장 톰켓서버를 거쳐서
+스프링에 컨트롤러가 있는지 물어봄 -> 있음 -> 
+return 하는 문자열에 해당하는 파일이 템플릿에 있는지 viewResolver를 통해 찾음 
+있으면 그 파일에 모델에서 넘겨받은 value를 입힌 것으로 랜더링(변환)후 출력
+
+API
+API 는 JSON방식이다. key : value 쌍의 방식
+@ResponseBody 가 명시되어 있으면 http의 body에 내용을 직접 반환
+viewResolver가 아니고, HttpMesaageConverter가 작동함(http의 요청에 그냥 데이터 그대로 넘겨주자!이런느낌)
+HttpMesaageConverte는 리턴값이 단순 string이면 stirngconverter, 객체면Jsonconverter가 동작,처리한다.
+jsonconverter는 객체를 json스타일로 바꿔서 요청한 곳에 넘겨준다.
+
+정적 컨텐츠 : 파일을 그대로 전달.
+MVC, 템플릿 엔진 : 템플릿 엔진을 MODELVIEW CONTROLLER방식으로 프로그래밍해서 VIEW를 템플릿엔진으로 랜더링해서 랜더링이 된 html을 전달 
+API : 객체를 JSON스타일로 바꿔서 전달.
+
+
+회원 관리 예제 - 백엔드 개발
+회원 도메인과 리포지토리 만들기
+
+stream() filter 관련 공부하기!
+
+회원 리포지토리 테스트 케이스 작성
+
+test를 먼저 만들고 구현하는 방식도 있음 
+
+회원 서비스 테스트
+test할때는 given when then 으로 나눠서 생각가능
+1.뭐가 주어졋는데 2.실행햇을때 3.결과가 뭐가 나와야한다. 의 순서
+
+스프링 빈과 의존관계
+컴포넌트 스캔과 자동 의존관계 설정
+
+controller를 통해서 외부요청을 받고
+service를 통해서 로직을 구현하고
+repository 에 데이터를 저장
+
+@Controller 가 있으면 스프링 빈으로 자동 등록됨
+
+컨포넌트 스캔
+@Service, @Repository, @Controller 등 같이
+@Component 를 포함하는 애노테이션이 있으면 스프링 컨테이너는 객체를 생성해서 등록(스프링 컨테이너에 스프링 빈으로 자동 등록)해둔다.
+
+자동 의존관계
+생성자에 @Autowired 를 사용하면 객체 생성 시점에 스프링 컨테이너에서 
+해당 스프링 빈을 찾아서 주입한다. 생성자가 1개만 있으면 @Autowired 는 생략할 수 있다.
+
+main 메소드가 있는 패키지의 하위 패키지들에 있는 것들은 스프링이 뒤져서
+(@Component 애노테이션이 있는 애들은)스프링빈으로 등록하지만 동일하거나 
+하위가 아닌 패키지들은 뒤져보지 않아서 기본적으로 등록되지 않는다.
+
+회원 관리 예제 - 웹 MVC 개발
+회원 웹 기능 - 등록
+Post : 전달
+Get : 조회
+
+localhost에서 회원가입할때 입력한 값을 name이라는 형식으로 넘겨주면 
+그걸 spring이 memberform form에 set함수를 통해 저장하고 그 객체를 create함수에 전달. 
+우리는 거기서 그 값을 멤버에 넣어줌 그러고 우리가 만들어논 객체들 사용해서 저장하고 생성하고 다하면됨
+
+스프링 DB 접근 기술
+순수 JDBC
+DB에 접근하려면 Datasource 가 필요함
+
+스프링의 장점
+인터페이스를 두고 구현체를 바꿔서 사용할 수 있다.
+스프링 컨테이너가 지원한다. DI(Dependency injection)를 통해
+
+OCP(Open Closed Principle) 개방 폐쇄 원칙
+확장에는 열려있고 수정에는 닫혀있다.
+즉, 조립하는 코드들은 수정해야하지만, 실제 동작하는데 필요한 코드들은 
+변경하지 않고 설정만으로 변경할 수 있다.
+
+스프링 통합 테스트
+DB까지 연동해서 테스트하는 통합테스트 과정
+이전에 했던 테스트들은 그냥 우리가만든 자바 메소드들을 그냥 잘돌아가나 테스트 했던 거임, 
+근데 DB관련 Connection이나 뭐이런 애들은 spring이 갖고있어서 테스트도 spring이랑 엮어서 해야함
+@SpringBootTest
+@Transactional
+을 통해 통합 테스트를 할 수 있다 .
+어차피 테스트는 실제로 사용할 코드가 아니기 때문에,
+걍 필요한 객체나 그런거 있으면 autowired써서 주입시켜도 된다
+
+@Transactional 
+테스트를 시작할때 트렉젝션을 먼저 시작하고 테스트가 끝나면 롤백해준다. 
+DB에 테스트 할 때 넣었던 데이터가 반영이 안되서 좋음
+
+
+@SpringBootTest
+스프링 컨테이너와 테스트를 함께 시작한다
+
+스프링 JdbcTemplate
+생성자가 하나있으면 @Autowired 생략가능
+JdbcTemplate 은 반복코드를 제거해준다 하지만 SQL은 직접 작성해야함
+라이브러리다
+
+JPA
+
+JPA의 장점
+기존의 반복코드, SQL쿼리, 도 JPA가 직접 만들어서 처리해서 실행해준다.
+개발 생산성을 올릴 수 있다 
+
+
+자바의 표준 인터페이스
+ORM 기술이다.
+객체와 관계DB를 맵핑하는 기술
+
+DB에 등록되면 DB가 자동으로 id를 생성하는 것을 Identity 전략이라고한다
+Jpa는 entitymanager를 통해 동작한다.
+스프링 부트가 자동으로 entitymanger를 생성한다. 만들어진걸 injection 받으면된다.
+JPA를 쓰려면 Entitymanager를 주입받아야한다.
+PK기반이아닌 항목으로의 조회는 JPQL을 작성해 줘야함
+
+
+인터페이스가 인터페이스를 받을떈 extends사용
+
