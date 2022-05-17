@@ -1,11 +1,9 @@
 package hello.springmvc.basic.request;
 
+import hello.springmvc.basic.HelloData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -25,13 +23,14 @@ public class RequestParamController {
         response.getWriter().write("ok");
     }
 
-    @ResponseBody
+    @ResponseBody // 없으면 return 하는 string으로 Viewresolver를 통해 해당하는 이름의 view를 찾게됨, 이걸 쓰면 response body부분에 return 하는 값을 넣어서 반환
     @RequestMapping("/request-param-v2")
     public String requestParamV2(@RequestParam("username") String memberName, @RequestParam("age") int memberAge){
         log.info("username = {}, age = {}", memberName, memberAge);
         return "ok";
     }
 
+    //HTTP 파라미터명과 변수명이 같으면 ("~~") 부분 생략 가능!
     @ResponseBody
     @RequestMapping("/request-param-v3")
     public String requestParamV3(@RequestParam String username, @RequestParam int age){
@@ -39,6 +38,7 @@ public class RequestParamController {
         return "ok";
     }
 
+    //기본 자료형에 대해 @RequestParam 생략 가능;  근데 써주는게 좀 더 직관적으로 이해하기 편함
     @ResponseBody
     @RequestMapping("/request-param-v4")
     public String requestParamV4(String username, int age){
@@ -49,7 +49,7 @@ public class RequestParamController {
     // Java에선 기본형(int, byte, char, short, long, float, double, boolean)에
     // null을 입력 할 수 없음
     // null을 int형에 넣으려면 Integer으로 선언
-
+    // required = true 일 때, /request-param-required/username= 와 같이 빈문자가 입력되면 입력이 된 것으로 받아들임
     @ResponseBody
     @RequestMapping("/request-param-required")
     public String requestParamRequired(@RequestParam(required = true) String username, @RequestParam(required = false) Integer age){
@@ -59,6 +59,7 @@ public class RequestParamController {
 
     // 사실상 defaultValue를 사용하면 required가 의미가 없음
     // 빈 문자열이 들어오더라도 defaultValue가 적용됨
+    // null이 들어와도 defaultValue가 적용됨
     @ResponseBody
     @RequestMapping("/request-param-default")
     public String requestParamDefault(@RequestParam(required = true,defaultValue = "guest") String username, @RequestParam(required = false,defaultValue = "-1") int age){
@@ -72,4 +73,23 @@ public class RequestParamController {
         log.info("username = {}, age = {}", paramMap.get("username"), paramMap.get("age"));
         return "ok";
     }
+
+    @ResponseBody
+    @RequestMapping("/model-attribute-v1")
+    public String modelAttributeV1(@ModelAttribute HelloData helloData){
+        log.info("username = {}, age = {}", helloData.getUsername(), helloData.getAge());
+        log.info("helloData = {}",helloData);
+        return "ok";
+    }
+
+    //@ModelAttribute 는 생략 가능하지만 혼돈이 생길 수도 있음
+    @ResponseBody
+    @RequestMapping("/model-attribute-v2")
+    public String modelAttributeV2(HelloData helloData){
+        log.info("username = {}, age = {}", helloData.getUsername(), helloData.getAge());
+        log.info("helloData = {}",helloData);
+        return "ok";
+    }
+
+
 }
