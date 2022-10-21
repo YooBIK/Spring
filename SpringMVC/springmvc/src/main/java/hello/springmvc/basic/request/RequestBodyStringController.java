@@ -42,6 +42,6 @@ public class RequestBodyStringController {
         String messageBody = httpEntity.getBody();
 
         log.info("messageBody = {}", messageBody);
-        responseWriter.write("ok");
+        //responseWriter.write("ok");
     }
 }

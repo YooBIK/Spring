@@ -9,7 +9,7 @@ public class MappingController {
 
     @RequestMapping("/hello-basic")
     public String helloBasic(){
-        log.info("hello basic");
+        log.info("helloBasic");
         return "ok";
     }
 
@@ -39,7 +39,7 @@ public class MappingController {
 
     /** * PathVariable 사용
      * 변수명이 같으면 생략 가능
-     * @PathVariable("userId") String userId -> @PathVariable userId
+     * @PathVariable("userId") String userId -> @PathVariable String userId
      */
     @GetMapping("/mapping/{userId}")
     public String mappingPath(@PathVariable String userId) {
