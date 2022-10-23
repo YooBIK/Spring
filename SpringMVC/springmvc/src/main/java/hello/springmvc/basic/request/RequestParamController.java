@@ -31,7 +31,7 @@ public class RequestParamController {
         return "ok";
     }
 
-    //HTTP 파라미터명과 변수명이 같으면 ("~~") 부분 생략 가능!
+    //HTTP Parameter 이름과 변수 이름이 같으면 name 속성 생략 가능!
     @ResponseBody
     @RequestMapping("/request-param-v3")
     public String requestParamV3(@RequestParam String username, @RequestParam int age) {
@@ -39,7 +39,8 @@ public class RequestParamController {
         return "ok";
     }
 
-    //기본 자료형에 대해 @RequestParam 생략 가능;  근데 써주는게 좀 더 직관적으로 이해하기 편함
+    //기본 자료형에 대해 @RequestParam 생략 가능
+    //히지만, 써주는 것이 직관적으로 이해하기 편함
     @ResponseBody
     @RequestMapping("/request-param-v4")
     public String requestParamV4(String username, int age) {

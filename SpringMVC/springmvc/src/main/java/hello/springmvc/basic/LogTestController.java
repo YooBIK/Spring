@@ -19,8 +19,7 @@ public class LogTestController {
 
 //        System.out.println("name = " + name);
 
-        //이 방법은 권장 X, 불필요한 작업에 리소스를 사용할 여지가 있다.
-//        log.trace("trace log ="+name);
+        //log.trace("trace log ="+name); //이 방법은 권장 X, 불필요한 작업에 리소스를 사용할 여지가 있다.
 
         log.trace("trace Log={}", name);
         log.debug("debug Log={}", name);
