@@ -3,6 +3,7 @@ package hello.springmvc.basic.request;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.jni.Local;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.function.ServerRequest;
@@ -20,7 +21,7 @@ public class RequestHeaderController {
                           HttpServletResponse response,
                           HttpMethod httpMethod,
                           Locale locale,
-                          @RequestHeader MultiValueMap<String ,String> headerMap,
+                          @RequestHeader MultiValueMap<String, String> headerMap,
                           @RequestHeader("host") String host,
                           @CookieValue(value = "myCookie", required = false) String cookie) {
 

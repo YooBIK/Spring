@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 public class MappingController {
 
     @RequestMapping("/hello-basic")
-    public String helloBasic(){
+    public String helloBasic() {
         log.info("helloBasic");
         return "ok";
     }
@@ -25,6 +25,7 @@ public class MappingController {
 
     /**
      * 편리한 축약 애노테이션 (코드보기)
+     *
      * @GetMapping
      * @PostMapping
      * @PutMapping
@@ -37,8 +38,10 @@ public class MappingController {
         return "ok";
     }
 
-    /** * PathVariable 사용
+    /**
+     * PathVariable 사용
      * 변수명이 같으면 생략 가능
+     *
      * @PathVariable("userId") String userId -> @PathVariable String userId
      */
     @GetMapping("/mapping/{userId}")
@@ -84,7 +87,8 @@ public class MappingController {
         return "ok";
     }
 
-    /** * Accept 헤더 기반 Media Type
+    /**
+     * Accept 헤더 기반 Media Type
      * produces = "text/html"
      * produces = "!text/html"
      * produces = "text/*"
