@@ -33,6 +33,4 @@ public class ResponseViewController {
     public void responseViewV3(Model model){
         model.addAttribute("data","hello!");
     }
-
-
 }
