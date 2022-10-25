@@ -1,8 +1,11 @@
 package hello.itemservice.web.basic;
 
+import ch.qos.logback.core.net.SyslogOutputStream;
+import hello.itemservice.domain.dto.ItemUpdateParamDto;
 import hello.itemservice.domain.item.Item;
 import hello.itemservice.domain.item.ItemRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +16,7 @@ import java.util.List;
 @Controller
 @RequestMapping("/basic/items")
 @RequiredArgsConstructor
+@Slf4j
 public class BasicItemController {
 
     private final ItemRepository itemRepository;
@@ -77,11 +81,26 @@ public class BasicItemController {
         return "basic/item";
     }
 
-//    @GetMapping("/{itemId}/edit")
-//    public String updateItem(@PathVariable long itemId, Model model){
-//
-//    }
+    @GetMapping("/{itemId}/edit")
+    public String editForm(@PathVariable long itemId, Model model){
+        Item item = itemRepository.findById(itemId);
+        model.addAttribute("item",item);
+        return "basic/editForm";
+    }
 
+    @PostMapping("/{itemId}/edit")
+    public String editItem(@PathVariable Long itemId, ItemUpdateParamDto itemUpdateParamDto){
+
+        log.info("itemId = {}",itemId);
+        log.info("itemName = {}",itemUpdateParamDto.getItemName());
+        log.info("itemPrice = {}",itemUpdateParamDto.getItemPrice());
+        log.info("itemQuantity = {}",itemUpdateParamDto.getItemQuantity());
+
+
+        itemRepository.update(itemId,itemUpdateParamDto);
+        return "redirect:/basic/items/{itemId}";
+
+    }
     /*
     Test 데이터 추가
      */
