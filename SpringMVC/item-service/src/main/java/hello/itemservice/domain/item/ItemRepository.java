@@ -14,28 +14,28 @@ public class ItemRepository {
     private static final Map<Long, Item> store = new HashMap<>();
     private static long sequence = 0L;
 
-    public Item save(Item item){
+    public Item save(Item item) {
         item.setId(++sequence);
         store.put(item.getId(), item);
         return item;
     }
 
-    public Item findById(Long id){
+    public Item findById(Long id) {
         return store.get(id);
     }
 
-    public List<Item> findAll(){
+    public List<Item> findAll() {
         return new ArrayList<>(store.values());
     }
 
-    public void update(Long itemId, ItemUpdateParamDto updateParam){
+    public void update(Long itemId, ItemUpdateParamDto updateParam) {
         Item findItem = findById(itemId);
         findItem.setItemName(updateParam.getItemName());
         findItem.setPrice(updateParam.getItemPrice());
         findItem.setQuantity(updateParam.getItemQuantity());
     }
 
-    public void clearStore(){
+    public void clearStore() {
         store.clear();
     }
 }

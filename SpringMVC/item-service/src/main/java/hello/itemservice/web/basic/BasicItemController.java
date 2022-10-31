@@ -1,6 +1,5 @@
 package hello.itemservice.web.basic;
 
-import ch.qos.logback.core.net.SyslogOutputStream;
 import hello.itemservice.domain.dto.ItemUpdateParamDto;
 import hello.itemservice.domain.item.Item;
 import hello.itemservice.domain.item.ItemRepository;
@@ -9,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -36,7 +36,7 @@ public class BasicItemController {
     }
 
     @GetMapping("/add")
-    public String addForm(){
+    public String addForm() {
         return "basic/addForm";
     }
 
@@ -75,10 +75,27 @@ public class BasicItemController {
     /*
     @ModelAttribute 생략 -> 클래스 이름의 첫 글자를 소문자로 치환해서 Model에 넣음
      */
-    @PostMapping("/add")
-    public String addItemV4(@ModelAttribute Item item){
+    //@PostMapping("/add")
+    public String addItemV4(Item item){
         itemRepository.save(item);
         return "basic/item";
+    }
+
+    /*
+    PRG(Post, Redirect, Get) 패턴 적용
+     */
+    //@PostMapping("/add")
+    public String addItemV5(Item item){
+        itemRepository.save(item);
+        return "redirect:/basic/items/" + item.getId(); // URL 인코딩 시 위험할 수 있음
+    }
+
+    @PostMapping("/add")
+    public String addItemV6(Item item, RedirectAttributes redirectAttributes){
+        Item savedItem = itemRepository.save(item);
+        redirectAttributes.addAttribute("itemId",savedItem.getId());
+        redirectAttributes.addAttribute("status",true);
+        return "redirect:/basic/items/{itemId}"; // URL 인코딩 시 위험할 수 있음
     }
 
     @GetMapping("/{itemId}/edit")
@@ -95,7 +112,6 @@ public class BasicItemController {
         log.info("itemName = {}",itemUpdateParamDto.getItemName());
         log.info("itemPrice = {}",itemUpdateParamDto.getItemPrice());
         log.info("itemQuantity = {}",itemUpdateParamDto.getItemQuantity());
-
 
         itemRepository.update(itemId,itemUpdateParamDto);
         return "redirect:/basic/items/{itemId}";
