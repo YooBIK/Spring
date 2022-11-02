@@ -11,9 +11,11 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+
 import static org.junit.Assert.*;
 
-@Transactional
+@Transactional  //테스트의 경우 테스트 이후 롤백
 @SpringBootTest
 @RunWith(SpringRunner.class)
 public class MemberServiceTest {
@@ -32,17 +34,27 @@ public class MemberServiceTest {
 
         //when
         Long savedId = memberService.join(member);
-
         //then
         assertEquals(member,memberRepository.findOne(savedId));
 
     }
 
-    @Test
+    @Test(expected= IllegalStateException.class)
     public void 중복회원예외()throws Exception{
         //given
+        Member member1 = new Member();
+        member1.setName("yoo");
+
+        Member member2 = new Member();
+        member2.setName("yoo");
+
         //when
+        memberService.join(member1);
+        memberService.join(member2); // 예외 발생 해야함!
+
+
         //then
+        fail("예외가 발생해야 한다.");
     }
 
 }
