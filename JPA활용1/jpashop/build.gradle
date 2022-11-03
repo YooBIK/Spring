@@ -23,6 +23,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-devtools'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'mysql:mysql-connector-java'
 	testImplementation 'junit:junit:4.13.1'
 	compileOnly 'org.projectlombok:lombok'
