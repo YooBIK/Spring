@@ -22,26 +22,34 @@ public class JpaMain {
          */
         tx.begin();
         try {
-            Member member = new Member();
-            member.setId(1L);
-            member.setName("helloA");
+//            Member member = new Member();
+//            member.setId(2L);
+//            member.setName("helloA");
 
-            em.persist(member);
+            /*
+             * 여기까지는 아무 상태도 아님(비영속)
+             */
 
-            tx.commit();
-        }catch (Exception e){
-            tx.rollback();
-        }finally {
-            //em.close();
-        }
+            //여기서부터 영속 상태
+            // DB에 저장된 것은 아님!
+//            System.out.println("==== BEFORE ====");
+//            em.persist(member);
+//            System.out.println("==== AFTER ====");
 
-        /*
-        ** 조회(find) & 수정()
-         */
-        tx.begin();
-        try {
-            Member findMember = em.find(Member.class, 1L);
-            findMember.setName("helloUpdated");
+//            // 1차 캐시로 인해 1번의 쿼리만 발생!
+//            Member findMember1 = em.find(Member.class, 2L);
+//            Member findMember2 = em.find(Member.class, 2L);
+//            //동일성 보장
+//            System.out.println("result = " + (findMember1 == findMember2));
+
+
+            // INSERT 쿼리는 commit() 할 때 보낸다
+            Member member1 = new Member(150L, "memberA");
+            Member member2 = new Member(160L, "memberB");
+            em.persist(member1);
+            em.persist(member2);
+            System.out.println("====================");
+
             tx.commit();
         }catch (Exception e){
             tx.rollback();
@@ -49,7 +57,19 @@ public class JpaMain {
             em.close();
         }
 
-
-        emf.close();
+//        /*
+//        ** 조회(find) & 수정()
+//         */
+//        tx.begin();
+//        try {
+//            Member findMember = em.find(Member.class, 1L);
+//            findMember.setName("helloUpdated");
+//            tx.commit();
+//        }catch (Exception e){
+//            tx.rollback();
+//        }finally {
+//            em.close();
+//        }
+//        emf.close();
     }
 }
