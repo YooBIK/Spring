@@ -10,6 +10,17 @@ public class Member {
     public Member(){
     }
 
+    /*
+    * @Id : DB 테이블 PK 맵핑, 이것만 사용하면 PK 직접 할당
+    * @GeneratedValue : 자동 생성
+    *   - IDENTITY : PK 생성을 DB에 위임, DB에 넣기 전에 PK를 알 수가 없음
+    *                그래서 예외적으로 persist 할 때, 바로 DB에 INSERT Query를 날림
+    *   - SEQUENCE : DB의 SEQUENCE Object 사용(Oracle ...)
+    *                allocation Size를 통해 성능 최적화 가능!
+    *   - TABLE : 키 생성 전용 테이블 생성 -> SEQUENCE와 비슷하게 사용 (모든 DB에 적용 가능 BUT, 성능 별로)
+    *             allocation Size를 통해 성능 최적화 가능!
+    *   - AUTO : DB 방언에 맞춰 자동 생성(Oracle - sequence)
+     */
     @Id
     private Long id;
 
