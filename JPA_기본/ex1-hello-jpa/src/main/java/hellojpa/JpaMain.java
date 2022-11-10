@@ -43,12 +43,12 @@ public class JpaMain {
 //            System.out.println("result = " + (findMember1 == findMember2));
 
 
-            // INSERT 쿼리는 commit() 할 때 보낸다
-            Member member1 = new Member(150L, "memberA");
-            Member member2 = new Member(160L, "memberB");
-            em.persist(member1);
-            em.persist(member2);
-            System.out.println("====================");
+//            // INSERT 쿼리는 commit() 할 때 보낸다
+//            Member member1 = new Member(150L, "memberA");
+//            Member member2 = new Member(160L, "memberB");
+//            em.persist(member1);
+//            em.persist(member2);
+//            System.out.println("====================");
 
             tx.commit();
         }catch (Exception e){
@@ -70,6 +70,6 @@ public class JpaMain {
 //        }finally {
 //            em.close();
 //        }
-//        emf.close();
+        emf.close();
     }
 }
