@@ -12,6 +12,17 @@ public class Member {
     @Column(name = "MEMBER_ID")
     private Long id;
     private String name;
+
+//    /*
+//    * 객체지향적이지 않음,
+//     */
+//    @Column(name = "TEAM_ID")
+//    private Long teamId;
+
+    @ManyToOne
+    @JoinColumn(name = "TEAM_ID")
+    private Team team;
+
     private String city;
     private String street;
     private String zipcode;
@@ -30,6 +41,14 @@ public class Member {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Team getTeam() {
+        return team;
+    }
+
+    public void setTeam(Team team) {
+        this.team = team;
     }
 
     public String getCity() {
