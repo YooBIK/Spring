@@ -33,6 +33,15 @@ public class Member {
     @JoinColumn(name = "LOCKER_ID")
     private Locker locker;
 
+    /*
+    * N:M 관계는 중간 테이블을 사용
+    * 중간 테이블 수정이 어려움
+    * 되도록 사용하지 말자 ! (N:M -> 1 : N , N : 1 관계로 풀어서 사용)
+     */
+    @ManyToMany
+    @JoinTable(name = "MEMBER_PRODUCT")
+    private List<Product> products = new ArrayList<>();
+
     private String city;
     private String street;
     private String zipcode;
