@@ -33,7 +33,7 @@ public class JpaMain {
              3. 하지만, 영속성 컨텍스트에 담겨있을때는, LIST가 비어있음!! (순수한 객체 상태이다.)
                 !! 웬만하면 양방향 연관 관계에서 양쪽 다 값을 세팅하자 !!
                 !! 이 때, 연관관계 편의 메소드를 작성하자. !!
-                여기선 Member의 setTeam에 로직을 추가했다.
+                여기선 Member의 setTeam에 로직을 추가했다. setter를 사용하기 보단 새로 정의하자 !!
              */
             //team.getMembers().add(member);
 
