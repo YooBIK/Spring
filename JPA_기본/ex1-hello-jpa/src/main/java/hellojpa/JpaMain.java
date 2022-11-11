@@ -43,12 +43,21 @@ public class JpaMain {
 //            System.out.println("result = " + (findMember1 == findMember2));
 
 
-            // INSERT 쿼리는 commit() 할 때 보낸다
-            Member member1 = new Member(150L, "memberA");
-            Member member2 = new Member(160L, "memberB");
-            em.persist(member1);
-            em.persist(member2);
-            System.out.println("====================");
+//            //INSERT 쿼리는 commit() 할 때 보낸다. 정확히는 flush, (commit 또는 JPQL 실행 시)
+//            Member member1 = new Member(150L, "memberA");
+//            Member member2 = new Member(160L, "memberB");
+//            em.persist(member1);
+//            em.persist(member2);
+//            System.out.println("====================");
+
+
+            /*
+             * detach 하면 영속성 컨테이너가 더이상 관리하지 않는다.
+             * 따라서, 변경이 일어나도 변경 감지 대상이 아님.
+             */
+//            Member findMember = em.find(Member.class,1L);
+//            findMember.setName("updateName");
+//            em.detach(findMember);
 
             tx.commit();
         }catch (Exception e){
