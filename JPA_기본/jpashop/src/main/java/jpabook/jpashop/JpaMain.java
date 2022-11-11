@@ -16,6 +16,10 @@ public class JpaMain {
         EntityTransaction transaction = entityManager.getTransaction();
         transaction.begin();
         try{
+
+            /*
+            2. 연관 관계 주인인 Member에서 Team을 추가해야함!!
+             */
             Team team = new Team();
             team.setName("TeamA");
             entityManager.persist(team);
@@ -26,21 +30,25 @@ public class JpaMain {
             entityManager.persist(member);
 
             /*
-            영속성 컨텍스트의 쿼리들을 DB에 전송 + 영속성 컨택스트 초기화
+             3. 하지만, 영속성 컨텍스트에 담겨있을때는, LIST가 비어있음!! (순수한 객체 상태이다.)
+                !! 웬만하면 양방향 연관 관계에서 양쪽 다 값을 세팅하자 !!
+                !! 이 때, 연관관계 편의 메소드를 작성하자. !!
+                여기선 Member의 setTeam에 로직을 추가했다.
              */
+            //team.getMembers().add(member);
+
+//            /*
+//              **연관관계의 주인에 값을 입력해야함**
+//              ** 1. Team은 연관관계의 주인이 아니기 때문에, 읽기 전용이다. 즉 DB에 입력한 사항이 반영되지 않음!!
+//             */
+//            Team team = new Team();
+//            team.setName("TeamA");
+//            team.getMembers().add(member);
+//            entityManager.persist(team);
+
+
             entityManager.flush();
             entityManager.clear();
-
-            /*
-            연관관계 매핑을 사용해 컬렉션에서 객체를 꺼내는 것처럼 사용 가능
-            mapped by 를 활용해 서로 참조 가능!!
-             */
-            Member findMember = entityManager.find(Member.class, member.getId());
-            List<Member> members = findMember.getTeam().getMembers();
-
-            for(var v : members){
-                System.out.println("member = " + v.getName());
-            }
 
             transaction.commit();
         }catch (Exception e){
