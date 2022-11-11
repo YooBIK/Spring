@@ -5,6 +5,7 @@ import org.hibernate.annotations.GeneratorType;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
 
 @Entity
 public class Member {
@@ -25,10 +26,20 @@ public class Member {
     @JoinColumn(name = "TEAM_ID")
     private Team team;
 
+    /*
+    * Locker에 mapped by 가 없으면 1:1 단방향 연관 관계
+     */
+    @OneToOne
+    @JoinColumn(name = "LOCKER_ID")
+    private Locker locker;
+
     private String city;
     private String street;
     private String zipcode;
 
+    /*
+    * N:1 양방향 연관 관계를 설정
+     */
     @OneToMany(mappedBy = "member")
     private List<Order> orders = new ArrayList<>();
 
