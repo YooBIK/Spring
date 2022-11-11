@@ -23,13 +23,18 @@ public class Order {
     @ManyToOne
     @JoinColumn(name="MEMBER_ID")
     private Member member;
+
+    @OneToMany(mappedBy = "order")
+    private List<OrderItem> orderItems = new ArrayList<>();
+
+    @OneToOne
+    @JoinColumn(name = "DELIVERY_ID")
+    private Delivery delivery;
+
     private LocalDateTime orderDateTime;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
-
-    @OneToMany(mappedBy = "order")
-    private List<OrderItem> orderItems = new ArrayList<>();
 
     public Long getId() {
         return id;
