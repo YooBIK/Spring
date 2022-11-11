@@ -50,7 +50,6 @@ public class JpaMain {
 //            em.persist(member2);
 //            System.out.println("====================");
 
-
             /*
              * detach 하면 영속성 컨테이너가 더이상 관리하지 않는다.
              * 따라서, 변경이 일어나도 변경 감지 대상이 아님.
@@ -58,6 +57,7 @@ public class JpaMain {
 //            Member findMember = em.find(Member.class,1L);
 //            findMember.setName("updateName");
 //            em.detach(findMember);
+
 
             tx.commit();
         }catch (Exception e){
@@ -79,6 +79,6 @@ public class JpaMain {
 //        }finally {
 //            em.close();
 //        }
-//        emf.close();
+        emf.close();
     }
 }
