@@ -2,6 +2,8 @@ package jpabook.jpashop.domain;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "ORDERS")
@@ -11,12 +13,24 @@ public class Order {
     @Column(name = "ORDER_ID")
     private Long id;
 
-    /*
-    * 이렇게 식별자만 받아오는 방식은 객체지향이 아닌, DB에 맞춰 객체를 설계하는 방식임
-    * 객체 그래프 탐색이 불가능함
-     */
-    @Column(name = "MEMBER_ID")
-    private Long memberId;
+//    /*
+//    * 이렇게 식별자만 받아오는 방식은 객체지향이 아닌, DB에 맞춰 객체를 설계하는 방식임
+//    * 객체 그래프 탐색이 불가능함
+//     */
+//    @Column(name = "MEMBER_ID")
+//    private Long memberId;
+
+    @ManyToOne
+    @JoinColumn(name="MEMBER_ID")
+    private Member member;
+
+    @OneToMany(mappedBy = "order")
+    private List<OrderItem> orderItems = new ArrayList<>();
+
+    @OneToOne
+    @JoinColumn(name = "DELIVERY_ID")
+    private Delivery delivery;
+
     private LocalDateTime orderDateTime;
 
     @Enumerated(EnumType.STRING)
@@ -30,12 +44,12 @@ public class Order {
         this.id = id;
     }
 
-    public Long getMemberId() {
-        return memberId;
+    public Member getMember() {
+        return member;
     }
 
-    public void setMemberId(Long memberId) {
-        this.memberId = memberId;
+    public void setMember(Member member) {
+        this.member = member;
     }
 
     public LocalDateTime getOrderDateTime() {

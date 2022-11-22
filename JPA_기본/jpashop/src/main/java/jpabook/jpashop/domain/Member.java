@@ -3,6 +3,9 @@ package jpabook.jpashop.domain;
 import org.hibernate.annotations.GeneratorType;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.locks.Lock;
 
 @Entity
 public class Member {
@@ -23,9 +26,32 @@ public class Member {
     @JoinColumn(name = "TEAM_ID")
     private Team team;
 
+    /*
+    * Locker에 mapped by 가 없으면 1:1 단방향 연관 관계
+     */
+    @OneToOne
+    @JoinColumn(name = "LOCKER_ID")
+    private Locker locker;
+
+    /*
+    * N:M 관계는 중간 테이블을 사용
+    * 중간 테이블 수정이 어려움
+    * 되도록 사용하지 말자 ! (N:M -> 1 : N , N : 1 관계로 풀어서 사용)
+     */
+    @ManyToMany
+    @JoinTable(name = "MEMBER_PRODUCT")
+    private List<Product> products = new ArrayList<>();
+
     private String city;
     private String street;
     private String zipcode;
+
+    /*
+    * N:1 양방향 연관 관계를 설정
+     */
+    @OneToMany(mappedBy = "member")
+    private List<Order> orders = new ArrayList<>();
+
 
     public Long getId() {
         return id;
@@ -74,5 +100,13 @@ public class Member {
 
     public void setZipcode(String zipcode) {
         this.zipcode = zipcode;
+    }
+
+    public List<Order> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(List<Order> orders) {
+        this.orders = orders;
     }
 }
