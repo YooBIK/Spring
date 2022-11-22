@@ -3,7 +3,7 @@ package jpabook.jpashop.domain;
 import javax.persistence.*;
 
 @Entity
-public class OrderItem {
+public class OrderItem extends BaseEntity{
 
     @Id
     @GeneratedValue
@@ -17,7 +17,7 @@ public class OrderItem {
     @ManyToOne
     @JoinColumn(name = "ITEM_ID")
     private Item item;
-    
+
     private int orderPrice;
     private int count;
 
