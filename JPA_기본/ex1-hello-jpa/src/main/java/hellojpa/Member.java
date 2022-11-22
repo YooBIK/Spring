@@ -1,8 +1,9 @@
 package hellojpa;
 
 import javax.persistence.*;
-import javax.xml.crypto.Data;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 public class Member {
@@ -38,13 +39,37 @@ public class Member {
 
     private int age;
 
+//    /*
+//    * 객체지향적이지 않음,
+//     */
+//    @Column(name = "TEAM_ID")
+//    private Long teamId;
+    @ManyToOne
+    @JoinColumn(name = "TEAM_ID")
+    private Team team;
+
+    /*
+     * Locker에 mapped by 가 없으면 1:1 단방향 연관 관계
+     */
+    @OneToOne
+    @JoinColumn(name = "LOCKER_ID")
+    private Locker locker;
+
+    /*
+     * N:M 관계는 중간 테이블을 사용
+     * 중간 테이블 수정이 어려움
+     * 되도록 사용하지 말자 ! (N:M -> 1 : N , N : 1 관계로 풀어서 사용)
+     */
+    @ManyToMany
+    @JoinTable(name = "MEMBER_PRODUCT")
+    private List<Product> products = new ArrayList<>();
+
     /*
      * Enum 클래스 사용할 때 사용
      * ORDINARY, STRING
      * ORDINARY를 쓰면, Enum 클래스를 변경할 때, 순서에 의해 원하지 않은 결과가 생길 수 있음
      * -> STRING 사용할 것
      */
-
     @Enumerated(EnumType.STRING)
     private RoleType roleType;
 
@@ -62,9 +87,95 @@ public class Member {
     @Lob
     private String description;
 
-
     // 컬럼 맵핑 X
     @Transient
     private int temp;
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public Team getTeam() {
+        return team;
+    }
+
+    public void setTeam(Team team) {
+        this.team = team;
+    }
+
+    public Locker getLocker() {
+        return locker;
+    }
+
+    public void setLocker(Locker locker) {
+        this.locker = locker;
+    }
+
+    public List<Product> getProducts() {
+        return products;
+    }
+
+    public void setProducts(List<Product> products) {
+        this.products = products;
+    }
+
+    public RoleType getRoleType() {
+        return roleType;
+    }
+
+    public void setRoleType(RoleType roleType) {
+        this.roleType = roleType;
+    }
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public Date getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(Date lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public int getTemp() {
+        return temp;
+    }
+
+    public void setTemp(int temp) {
+        this.temp = temp;
+    }
 }

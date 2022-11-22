@@ -17,13 +17,7 @@ public class OrderItem {
     @ManyToOne
     @JoinColumn(name = "ITEM_ID")
     private Item item;
-
-//    @Column(name = "ORDER_ID")
-//    private Order order;
-//
-//    @Column(name = "ITEM_ID")
-//    private Long itemId;
-
+    
     private int orderPrice;
     private int count;
 
