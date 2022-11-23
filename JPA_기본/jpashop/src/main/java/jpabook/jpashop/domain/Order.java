@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static javax.persistence.CascadeType.*;
+
 @Entity
 @Table(name = "ORDERS")
 public class Order extends BaseEntity{
@@ -20,14 +22,14 @@ public class Order extends BaseEntity{
 //    @Column(name = "MEMBER_ID")
 //    private Long memberId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="MEMBER_ID")
     private Member member;
 
-    @OneToMany(mappedBy = "order")
+    @OneToMany(mappedBy = "order",cascade = ALL)
     private List<OrderItem> orderItems = new ArrayList<>();
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY,cascade = ALL)
     @JoinColumn(name = "DELIVERY_ID")
     private Delivery delivery;
 
@@ -40,24 +42,45 @@ public class Order extends BaseEntity{
         return id;
     }
 
-    public void setId(Long id) {
+    public Order setId(Long id) {
         this.id = id;
+        return this;
     }
 
     public Member getMember() {
         return member;
     }
 
-    public void setMember(Member member) {
+    public Order setMember(Member member) {
         this.member = member;
+        return this;
+    }
+
+    public List<OrderItem> getOrderItems() {
+        return orderItems;
+    }
+
+    public Order setOrderItems(List<OrderItem> orderItems) {
+        this.orderItems = orderItems;
+        return this;
+    }
+
+    public Delivery getDelivery() {
+        return delivery;
+    }
+
+    public Order setDelivery(Delivery delivery) {
+        this.delivery = delivery;
+        return this;
     }
 
     public LocalDateTime getOrderDateTime() {
         return orderDateTime;
     }
 
-    public void setOrderDateTime(LocalDateTime orderDateTime) {
+    public Order setOrderDateTime(LocalDateTime orderDateTime) {
         this.orderDateTime = orderDateTime;
+        return this;
     }
 
     public OrderStatus getOrderStatus() {
