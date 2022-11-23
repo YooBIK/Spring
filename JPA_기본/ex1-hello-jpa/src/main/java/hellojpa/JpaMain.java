@@ -6,6 +6,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import java.util.List;
 
 public class JpaMain {
     public static void main(String[] args) {
@@ -101,47 +102,92 @@ public class JpaMain {
 //            team.setName("TeamA");
 //            team.getMembers().add(member);
 //            entityManager.persist(team);
+//
+//            Member member = new Member();
+//            member.setName("hello");
+//
+//            em.persist(member);
+//
+//            em.flush();
+//            em.clear();
+//
+//
+//
+//            Member findMember = em.find(Member.class, member.getId());
 
-            Member member = new Member();
-            member.setName("hello");
+//            /*
+//            * getReference의 결과로 프록시 객체 생성(해당 엔티티가 영속성 컨텍스트에 없는 경우)
+//            * 프록시 객체는 원본 엔티티를 상속받아서 생성(원본 엔티티 클래스와 프록시는 == 비교 X(항상 FALSE)) 타입 체크시 instanceof 사용!!
+//            * 프록시 객체는 원본 엔티티를 가리키고 있고, 실제 메서드 호출, 값 조회 등이 일어날 때, 영속성 컨텍스트에 초기화를 요청한다.
+//            * 사용자가 엔티티 클래스의 함수 호출 -> 프록시 객체는 초기화 요청 -> 영속성 컨텍스트는 DB를 조회해서 실제 엔티티 생성
+//            * -> 프록시 객체는 실제 엔티티 객체를 가리킴 -> 실제 엔티티의 함수를 실행함
+//            * 만약 영속성 컨텍스트에 해당 엔티티가 있으면 프록시가 아닌 엔티티를 반환
+//            *   - 최적화 측면에서도 엔티티 반환이 이득
+//            *   - JPA는 같은 트랜젝션 안에서 조회한 엔티티는 == 비교시 TRUE를 보장함!
+//             */
+//            Member refMember = em.getReference(Member.class, member.getId());  //proxy
+//            System.out.println("findMember = " + refMember.getClass());
+//
+//
+//            // 초기화 여부 확인
+//            System.out.println("isLoaded = " + emf.getPersistenceUnitUtil().isLoaded(refMember));
+//
+//            // 강제 초기화
+//            Hibernate.initialize(refMember);
+//            System.out.println("isLoaded = " + emf.getPersistenceUnitUtil().isLoaded(refMember));
+//
+//
+//
+//            /*
+//            * 영속성 컨텍스트가 관리하지 않는 프록시 객체를 초기화하려 하면, 에러 발생
+//             */
+//            em.clear();
+//            //refMember.getName();
 
-            em.persist(member);
+            /*
+             * 즉시 로딩으로 설정하면 JPQL 사용할 때, N+1 문제 발생, 1번의 쿼리에 결과에 각각 SELECT 쿼리 (조회결과 N개에 각각 그래서 N+1 문제)
+             */
+            Team teamA = new Team();
+            teamA.setName("teamA");
+
+            Team teamB = new Team();
+            teamB.setName("teamB");
+
+            em.persist(teamA);
+            em.persist(teamB);
+
+            Member memberA = new Member();
+            memberA.setName("memberA");
+            memberA.setTeam(teamA);
+
+            Member memberB = new Member();
+            memberB.setName("memberB");
+            memberB.setTeam(teamB);
+
+            em.persist(memberA);
+            em.persist(memberB);
 
             em.flush();
             em.clear();
 
-
-
-            //Member findMember = em.find(Member.class, member.getId());
-
             /*
-            * getReference의 결과로 프록시 객체 생성(해당 엔티티가 영속성 컨텍스트에 없는 경우)
-            * 프록시 객체는 원본 엔티티를 상속받아서 생성(원본 엔티티 클래스와 프록시는 == 비교 X(항상 FALSE)) 타입 체크시 instanceof 사용!!
-            * 프록시 객체는 원본 엔티티를 가리키고 있고, 실제 메서드 호출, 값 조회 등이 일어날 때, 영속성 컨텍스트에 초기화를 요청한다.
-            * 사용자가 엔티티 클래스의 함수 호출 -> 프록시 객체는 초기화 요청 -> 영속성 컨텍스트는 DB를 조회해서 실제 엔티티 생성
-            * -> 프록시 객체는 실제 엔티티 객체를 가리킴 -> 실제 엔티티의 함수를 실행함
-            * 만약 영속성 컨텍스트에 해당 엔티티가 있으면 프록시가 아닌 엔티티를 반환
-            *   - 최적화 측면에서도 엔티티 반환이 이득
-            *   - JPA는 같은 트랜젝션 안에서 조회한 엔티티는 == 비교시 TRUE를 보장함!
+             * 즉시 로딩으로 설정하면 JPQL 사용할 때, N+1 문제 발생, 1번의 쿼리에 결과에 각각 SELECT 쿼리 (조회결과 N개에 각각 그래서 N+1 문제)
              */
-            Member refMember = em.getReference(Member.class, member.getId());  //proxy
-            System.out.println("findMember = " + refMember.getClass());
-
-
-            // 초기화 여부 확인
-            System.out.println("isLoaded = " + emf.getPersistenceUnitUtil().isLoaded(refMember));
-
-            // 강제 초기화
-            Hibernate.initialize(refMember);
-            System.out.println("isLoaded = " + emf.getPersistenceUnitUtil().isLoaded(refMember));
+            List<Member> resultList = em.createQuery("select m from Member m", Member.class).getResultList();
 
 
 
             /*
-            * 영속성 컨텍스트가 관리하지 않는 프록시 객체를 초기화하려 하면, 에러 발생
+             * 지연 로딩으로 설정하면, 해당 엔티티를 프록시로 받아옴
+             * 즉시 로딩으로 설정하면, 한번의 쿼리로 Member,Team 다 가져옴
              */
-            em.clear();
-            //refMember.getName();
+            Member findMember = em.find(Member.class, memberB.getId());
+            System.out.println("findMember.getTeam() = " + findMember.getTeam().getClass());
+
+            // 프록시의 값을 사용할 때, 프록시를 초기화함, (쿼리가 발생한다. (프록시를 가져올 때가 아닌 메서드나 필드값을 사용할 때임!))
+            System.out.println("=================");
+            findMember.getTeam().getName(); // 이때 초기화됨!
+            System.out.println("=================");
 
             tx.commit();
         }catch (Exception e){
