@@ -144,50 +144,72 @@ public class JpaMain {
 //            em.clear();
 //            //refMember.getName();
 
+//            /*
+//             * 즉시 로딩으로 설정하면 JPQL 사용할 때, N+1 문제 발생, 1번의 쿼리에 결과에 각각 SELECT 쿼리 (조회결과 N개에 각각 그래서 N+1 문제)
+//             */
+//            Team teamA = new Team();
+//            teamA.setName("teamA");
+//
+//            Team teamB = new Team();
+//            teamB.setName("teamB");
+//
+//            em.persist(teamA);
+//            em.persist(teamB);
+//
+//            Member memberA = new Member();
+//            memberA.setName("memberA");
+//            memberA.setTeam(teamA);
+//
+//            Member memberB = new Member();
+//            memberB.setName("memberB");
+//            memberB.setTeam(teamB);
+//
+//            em.persist(memberA);
+//            em.persist(memberB);
+//
+//            em.flush();
+//            em.clear();
+//
+//            /*
+//             * 즉시 로딩으로 설정하면 JPQL 사용할 때, N+1 문제 발생, 1번의 쿼리에 결과에 각각 SELECT 쿼리 (조회결과 N개에 각각 그래서 N+1 문제)
+//             */
+//            List<Member> resultList = em.createQuery("select m from Member m", Member.class).getResultList();
+//
+//
+//
+//            /*
+//             * 지연 로딩으로 설정하면, 해당 엔티티를 프록시로 받아옴
+//             * 즉시 로딩으로 설정하면, 한번의 쿼리로 Member,Team 다 가져옴
+//             */
+//            Member findMember = em.find(Member.class, memberB.getId());
+//            System.out.println("findMember.getTeam() = " + findMember.getTeam().getClass());
+//
+//            // 프록시의 값을 사용할 때, 프록시를 초기화함, (쿼리가 발생한다. (프록시를 가져올 때가 아닌 메서드나 필드값을 사용할 때임!))
+//            System.out.println("=================");
+//            findMember.getTeam().getName(); // 이때 초기화됨!
+//            System.out.println("=================");
+
+
+
+            Parent parent = new Parent();
+            Child childA = new Child();
+            Child childB = new Child();
+            parent.addChild(childA);
+            parent.addChild(childB);
+
             /*
-             * 즉시 로딩으로 설정하면 JPQL 사용할 때, N+1 문제 발생, 1번의 쿼리에 결과에 각각 SELECT 쿼리 (조회결과 N개에 각각 그래서 N+1 문제)
+            * CASCADE 옵션을 사용하지 않으면 하나하나 persist 해줘야함!
+            * CASCADE 옵션을 쓰면 parent만 persist해도 나머지도 됨!
              */
-            Team teamA = new Team();
-            teamA.setName("teamA");
-
-            Team teamB = new Team();
-            teamB.setName("teamB");
-
-            em.persist(teamA);
-            em.persist(teamB);
-
-            Member memberA = new Member();
-            memberA.setName("memberA");
-            memberA.setTeam(teamA);
-
-            Member memberB = new Member();
-            memberB.setName("memberB");
-            memberB.setTeam(teamB);
-
-            em.persist(memberA);
-            em.persist(memberB);
-
-            em.flush();
-            em.clear();
+            em.persist(parent);
+            em.persist(childA);
+            em.persist(childB);
 
             /*
-             * 즉시 로딩으로 설정하면 JPQL 사용할 때, N+1 문제 발생, 1번의 쿼리에 결과에 각각 SELECT 쿼리 (조회결과 N개에 각각 그래서 N+1 문제)
+            orphanRemoval 옵션을 사용하면 부모가 관리하지 않는 객체는 자동으로 지워버림! 
              */
-            List<Member> resultList = em.createQuery("select m from Member m", Member.class).getResultList();
+            parent.getChildList().remove(0);
 
-
-
-            /*
-             * 지연 로딩으로 설정하면, 해당 엔티티를 프록시로 받아옴
-             * 즉시 로딩으로 설정하면, 한번의 쿼리로 Member,Team 다 가져옴
-             */
-            Member findMember = em.find(Member.class, memberB.getId());
-            System.out.println("findMember.getTeam() = " + findMember.getTeam().getClass());
-
-            // 프록시의 값을 사용할 때, 프록시를 초기화함, (쿼리가 발생한다. (프록시를 가져올 때가 아닌 메서드나 필드값을 사용할 때임!))
-            System.out.println("=================");
-            findMember.getTeam().getName(); // 이때 초기화됨!
-            System.out.println("=================");
 
             tx.commit();
         }catch (Exception e){
