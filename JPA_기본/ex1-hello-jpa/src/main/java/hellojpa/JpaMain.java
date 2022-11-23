@@ -1,5 +1,7 @@
 package hellojpa;
 
+import org.hibernate.Hibernate;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
@@ -100,28 +102,51 @@ public class JpaMain {
 //            team.getMembers().add(member);
 //            entityManager.persist(team);
 
-            Team team = new Team();
-
-            em.persist(team);
-
             Member member = new Member();
             member.setName("hello");
-            member.setTeam(team);
 
             em.persist(member);
 
-            System.out.println(member.getId());
             em.flush();
             em.clear();
 
 
-            Member findMember = em.find(Member.class, member.getId());
-            System.out.println("findMember.getId() = " + findMember.getId());
-            System.out.println("findMember.getName() = " + findMember.getName());
+
+            //Member findMember = em.find(Member.class, member.getId());
+
+            /*
+            * getReference의 결과로 프록시 객체 생성(해당 엔티티가 영속성 컨텍스트에 없는 경우)
+            * 프록시 객체는 원본 엔티티를 상속받아서 생성(원본 엔티티 클래스와 프록시는 == 비교 X(항상 FALSE)) 타입 체크시 instanceof 사용!!
+            * 프록시 객체는 원본 엔티티를 가리키고 있고, 실제 메서드 호출, 값 조회 등이 일어날 때, 영속성 컨텍스트에 초기화를 요청한다.
+            * 사용자가 엔티티 클래스의 함수 호출 -> 프록시 객체는 초기화 요청 -> 영속성 컨텍스트는 DB를 조회해서 실제 엔티티 생성
+            * -> 프록시 객체는 실제 엔티티 객체를 가리킴 -> 실제 엔티티의 함수를 실행함
+            * 만약 영속성 컨텍스트에 해당 엔티티가 있으면 프록시가 아닌 엔티티를 반환
+            *   - 최적화 측면에서도 엔티티 반환이 이득
+            *   - JPA는 같은 트랜젝션 안에서 조회한 엔티티는 == 비교시 TRUE를 보장함!
+             */
+            Member refMember = em.getReference(Member.class, member.getId());  //proxy
+            System.out.println("findMember = " + refMember.getClass());
+
+
+            // 초기화 여부 확인
+            System.out.println("isLoaded = " + emf.getPersistenceUnitUtil().isLoaded(refMember));
+
+            // 강제 초기화
+            Hibernate.initialize(refMember);
+            System.out.println("isLoaded = " + emf.getPersistenceUnitUtil().isLoaded(refMember));
+
+
+
+            /*
+            * 영속성 컨텍스트가 관리하지 않는 프록시 객체를 초기화하려 하면, 에러 발생
+             */
+            em.clear();
+            //refMember.getName();
 
             tx.commit();
         }catch (Exception e){
             tx.rollback();
+            e.printStackTrace();
         }finally {
             em.close();
         }
