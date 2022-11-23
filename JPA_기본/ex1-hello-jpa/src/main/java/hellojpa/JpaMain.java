@@ -4,14 +4,11 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
-import java.time.LocalDateTime;
 
 public class JpaMain {
     public static void main(String[] args) {
-
         //EntityManagerFactory 가져오기, persistenceUnitName은 persistence.xml에 명시
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("hello");
-
         //EntityManager 가져오기
         EntityManager em = emf.createEntityManager();
 
@@ -23,6 +20,7 @@ public class JpaMain {
          */
         tx.begin();
         try {
+
 //            Member member = new Member();
 //            member.setId(2L);
 //            member.setName("helloA");
@@ -73,17 +71,17 @@ public class JpaMain {
 //            System.out.println("findMovie = " + findMovie);
 
 
-             /*
-            2. 연관 관계 주인인 Member에서 Team을 추가해야함!!
-             */
-            Team team = new Team();
-            team.setName("TeamA");
-            em.persist(team);
-
-            Member member = new Member();
-            member.setName("helloA");
-            member.setTeam(team);
-            em.persist(member);
+//             /*
+//            2. 연관 관계 주인인 Member에서 Team을 추가해야함!!
+//             */
+//            Team team = new Team();
+//            team.setName("TeamA");
+//            em.persist(team);
+//
+//            Member member = new Member();
+//            member.setName("helloA");
+//            member.setTeam(team);
+//            em.persist(member);
 
             /*
              3. 하지만, 영속성 컨텍스트에 담겨있을때는, LIST가 비어있음!! (순수한 객체 상태이다.)
@@ -102,7 +100,24 @@ public class JpaMain {
 //            team.getMembers().add(member);
 //            entityManager.persist(team);
 
+            Team team = new Team();
 
+            em.persist(team);
+
+            Member member = new Member();
+            member.setName("hello");
+            member.setTeam(team);
+
+            em.persist(member);
+
+            System.out.println(member.getId());
+            em.flush();
+            em.clear();
+
+
+            Member findMember = em.find(Member.class, member.getId());
+            System.out.println("findMember.getId() = " + findMember.getId());
+            System.out.println("findMember.getName() = " + findMember.getName());
 
             tx.commit();
         }catch (Exception e){

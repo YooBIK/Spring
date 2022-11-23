@@ -1,9 +1,7 @@
 package hellojpa;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -23,7 +21,7 @@ public class Member extends BaseEntity{
     *             allocation Size를 통해 성능 최적화 가능!
     *   - AUTO : DB 방언에 맞춰 자동 생성(Oracle - sequence)
      */
-    @Id
+    @Id @GeneratedValue
     private Long id;
 
     /*
@@ -49,12 +47,7 @@ public class Member extends BaseEntity{
     @JoinColumn(name = "TEAM_ID")
     private Team team;
 
-    /*
-     * Locker에 mapped by 가 없으면 1:1 단방향 연관 관계
-     */
-    @OneToOne
-    @JoinColumn(name = "LOCKER_ID")
-    private Locker locker;
+
 
     /*
      * N:M 관계는 중간 테이블을 사용
@@ -124,13 +117,7 @@ public class Member extends BaseEntity{
         this.team = team;
     }
 
-    public Locker getLocker() {
-        return locker;
-    }
 
-    public void setLocker(Locker locker) {
-        this.locker = locker;
-    }
 
     public List<Product> getProducts() {
         return products;
