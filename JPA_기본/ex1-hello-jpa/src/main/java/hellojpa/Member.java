@@ -1,6 +1,7 @@
 package hellojpa;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,6 +68,28 @@ public class Member extends BaseEntity{
     @Enumerated(EnumType.STRING)
     private RoleType roleType;
 
+    @Embedded
+    private Period period;
+
+    @Embedded
+    private Address HomeAddress;
+
+    /*
+    같은 임베디드 타입을 써야될 때, 컬럼명이 중복되니까 오류가 발생함
+    그떈 @AttributeOverride, @AttributeOverrides를 사용하자!
+     */
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "city",
+                    column = @Column(name = "WORK_CITY")),
+            @AttributeOverride(name = "street",
+                    column = @Column(name = "WORK_STREET")),
+            @AttributeOverride(name = "zipcode",
+                    column = @Column(name = "WORK_ZIPCODE"))
+    })
+    private Address workAddress;
+
+
 //    // DATE, TIME, TIMESTAMP 3가지, 시간 관련
 //    @Temporal(TemporalType.TIMESTAMP)
 //    private Date createdDate;
@@ -89,65 +112,98 @@ public class Member extends BaseEntity{
         return id;
     }
 
-    public void setId(Long id) {
+    public Member setId(Long id) {
         this.id = id;
+        return this;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public Member setName(String name) {
         this.name = name;
+        return this;
     }
 
     public int getAge() {
         return age;
     }
 
-    public void setAge(int age) {
+    public Member setAge(int age) {
         this.age = age;
+        return this;
     }
 
     public Team getTeam() {
         return team;
     }
 
-    public void setTeam(Team team) {
+    public Member setTeam(Team team) {
         this.team = team;
+        return this;
     }
-
-
 
     public List<Product> getProducts() {
         return products;
     }
 
-    public void setProducts(List<Product> products) {
+    public Member setProducts(List<Product> products) {
         this.products = products;
+        return this;
     }
 
     public RoleType getRoleType() {
         return roleType;
     }
 
-    public void setRoleType(RoleType roleType) {
+    public Member setRoleType(RoleType roleType) {
         this.roleType = roleType;
+        return this;
+    }
+
+    public Period getPeriod() {
+        return period;
+    }
+
+    public Member setPeriod(Period period) {
+        this.period = period;
+        return this;
+    }
+
+    public Address getHomeAddress() {
+        return HomeAddress;
+    }
+
+    public Member setHomeAddress(Address homeAddress) {
+        HomeAddress = homeAddress;
+        return this;
+    }
+
+    public Address getWorkAddress() {
+        return workAddress;
+    }
+
+    public Member setWorkAddress(Address workAddress) {
+        this.workAddress = workAddress;
+        return this;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
+    public Member setDescription(String description) {
         this.description = description;
+        return this;
     }
 
     public int getTemp() {
         return temp;
     }
 
-    public void setTemp(int temp) {
+    public Member setTemp(int temp) {
         this.temp = temp;
+        return this;
     }
 }

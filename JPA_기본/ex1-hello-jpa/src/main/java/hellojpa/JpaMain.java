@@ -6,6 +6,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class JpaMain {
@@ -191,25 +192,29 @@ public class JpaMain {
 
 
 
-            Parent parent = new Parent();
-            Child childA = new Child();
-            Child childB = new Child();
-            parent.addChild(childA);
-            parent.addChild(childB);
+//            Parent parent = new Parent();
+//            Child childA = new Child();
+//            Child childB = new Child();
+//            parent.addChild(childA);
+//            parent.addChild(childB);
+//
+//            /*
+//            * CASCADE 옵션을 사용하지 않으면 하나하나 persist 해줘야함!
+//            * CASCADE 옵션을 쓰면 parent만 persist해도 나머지도 됨!
+//             */
+//            em.persist(parent);
+//            em.persist(childA);
+//            em.persist(childB);
+//
+//            /*
+//            orphanRemoval 옵션을 사용하면 부모가 관리하지 않는 객체는 자동으로 지워버림!
+//             */
+//            parent.getChildList().remove(0);
 
-            /*
-            * CASCADE 옵션을 사용하지 않으면 하나하나 persist 해줘야함!
-            * CASCADE 옵션을 쓰면 parent만 persist해도 나머지도 됨!
-             */
-            em.persist(parent);
-            em.persist(childA);
-            em.persist(childB);
-
-            /*
-            orphanRemoval 옵션을 사용하면 부모가 관리하지 않는 객체는 자동으로 지워버림! 
-             */
-            parent.getChildList().remove(0);
-
+            Member member = new Member();
+            member.setPeriod(new Period(LocalDateTime.of(1996,5,25,19,30), LocalDateTime.now()));
+            member.setHomeAddress(new Address("서울","독막로","20길"));
+            em.persist(member);
 
             tx.commit();
         }catch (Exception e){
