@@ -3,43 +3,46 @@ package hellojpa;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
-public class Member extends BaseEntity{
+public class Member extends BaseEntity {
 
-    public Member(){
+    public Member() {
     }
 
     /*
-    * @Id : DB 테이블 PK 맵핑, 이것만 사용하면 PK 직접 할당
-    * @GeneratedValue : 자동 생성
-    *   - IDENTITY : PK 생성을 DB에 위임, DB에 넣기 전에 PK를 알 수가 없음
-    *                그래서 예외적으로 persist 할 때, 바로 DB에 INSERT Query를 날림
-    *   - SEQUENCE : DB의 SEQUENCE Object 사용(Oracle ...)
-    *                allocation Size를 통해 성능 최적화 가능!
-    *   - TABLE : 키 생성 전용 테이블 생성 -> SEQUENCE와 비슷하게 사용 (모든 DB에 적용 가능 BUT, 성능 별로)
-    *             allocation Size를 통해 성능 최적화 가능!
-    *   - AUTO : DB 방언에 맞춰 자동 생성(Oracle - sequence)
+     * @Id : DB 테이블 PK 맵핑, 이것만 사용하면 PK 직접 할당
+     * @GeneratedValue : 자동 생성
+     *   - IDENTITY : PK 생성을 DB에 위임, DB에 넣기 전에 PK를 알 수가 없음
+     *                그래서 예외적으로 persist 할 때, 바로 DB에 INSERT Query를 날림
+     *   - SEQUENCE : DB의 SEQUENCE Object 사용(Oracle ...)
+     *                allocation Size를 통해 성능 최적화 가능!
+     *   - TABLE : 키 생성 전용 테이블 생성 -> SEQUENCE와 비슷하게 사용 (모든 DB에 적용 가능 BUT, 성능 별로)
+     *             allocation Size를 통해 성능 최적화 가능!
+     *   - AUTO : DB 방언에 맞춰 자동 생성(Oracle - sequence)
      */
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     private Long id;
 
     /*
-    * name : 테이블의 컬럼 명
-    * insertable, updatable : 등록 or 변경 가능 여부
-    * nullable : null 값 허용 여부, 테이블 생성 시 not null 제약 조건
-    * unique : true 설정 시, Unique 제약 조건 but Table에 거는 방식이 더 나음
-    * length : String(VARCHAR)의 길이 제한
-    * columnDefinition : DB 컬럼 정보를 직접 입력
-    *
+     * name : 테이블의 컬럼 명
+     * insertable, updatable : 등록 or 변경 가능 여부
+     * nullable : null 값 허용 여부, 테이블 생성 시 not null 제약 조건
+     * unique : true 설정 시, Unique 제약 조건 but Table에 거는 방식이 더 나음
+     * length : String(VARCHAR)의 길이 제한
+     * columnDefinition : DB 컬럼 정보를 직접 입력
+     *
      */
     @Column(name = "USERNAME")
     private String name;
 
     private int age;
 
-//    /*
+    //    /*
 //    * 객체지향적이지 않음,
 //     */
 //    @Column(name = "TEAM_ID")
@@ -47,7 +50,6 @@ public class Member extends BaseEntity{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "TEAM_ID")
     private Team team;
-
 
 
     /*
@@ -89,6 +91,47 @@ public class Member extends BaseEntity{
     })
     private Address workAddress;
 
+    /*
+    * 값 타입 컬렉션
+        * 값 타입을 하나 이상 저장할 때 사용한다.
+        * 컬렉션을 저장하기 위한 별도의 테이블을 생성한다.
+     */
+    @ElementCollection
+    @CollectionTable(name = "FAVORITE_FOOD",
+            joinColumns = @JoinColumn(name = "MEMBER_ID"))
+    @Column(name = "FOOD_NAME")
+    private Set<String> favoriteFoods = new HashSet<>();
+
+//    /*
+//    생각해야 될게 너무 많음
+//    좋은 방법이 아니다 !!
+//     */
+//    @ElementCollection
+//    @CollectionTable(name = "ADDRESS_HISTORY",
+//            joinColumns = @JoinColumn(name = "MEMBER_ID"))
+//    private List<Address> addresseHistory = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL,orphanRemoval = true)
+    @JoinColumn(name = "MEMBER_ID")
+    private List<AddressEntity> addressHistory = new ArrayList<>();
+
+    public Set<String> getFavoriteFoods() {
+        return favoriteFoods;
+    }
+
+    public Member setFavoriteFoods(Set<String> favoriteFoods) {
+        this.favoriteFoods = favoriteFoods;
+        return this;
+    }
+
+    public List<AddressEntity> getAddressHistory() {
+        return addressHistory;
+    }
+
+    public Member setAddressHistory(List<AddressEntity> addressHistory) {
+        this.addressHistory = addressHistory;
+        return this;
+    }
 
 //    // DATE, TIME, TIMESTAMP 3가지, 시간 관련
 //    @Temporal(TemporalType.TIMESTAMP)
@@ -98,8 +141,8 @@ public class Member extends BaseEntity{
 //    private Date lastModifiedDate;
 
     /*
-    * VARCHAR 제한을 넘어서는 경우 사용!
-    * String 이면 CLOB, 나머지는 BLOB으로 맵핑
+     * VARCHAR 제한을 넘어서는 경우 사용!
+     * String 이면 CLOB, 나머지는 BLOB으로 맵핑
      */
     @Lob
     private String description;

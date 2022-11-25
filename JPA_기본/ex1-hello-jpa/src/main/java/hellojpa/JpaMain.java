@@ -8,6 +8,7 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 public class JpaMain {
     public static void main(String[] args) {
@@ -210,38 +211,99 @@ public class JpaMain {
 //            orphanRemoval 옵션을 사용하면 부모가 관리하지 않는 객체는 자동으로 지워버림!
 //             */
 //            parent.getChildList().remove(0);
+
+
+//            Member member = new Member();
+//            member.setName("member1");
+//            member.setPeriod(new Period(LocalDateTime.of(1996,5,25,19,30), LocalDateTime.now()));
+//            member.setHomeAddress(new Address("서울","독막로","20길"));
+//            em.persist(member);
+
+
+//            /*
+//            값 타입을 공유해버리면, 의도치 않게 문제가 발생할 수 있음, 찾기 매우 어려움
+//            그때그때 값을 복사해서 사용하자!
+//            수정자를 막았으면, 수정할 때 마다 새로운 객체를 생성해서 넣어주자
+//             */
+//            Address address = new Address("서울", "길거리", "10000");
+//            Member member1 = new Member();
+//            member1.setName("member1");
+//            member1.setHomeAddress(address);
+//
+//            em.persist(member1);
+//
+//            /*
+//            값을 복사한 새로운 객체 생성
+//             */
+//            Address copyAddress = new Address(address.getCity(), address.getStreet(), address.getZipcode());
+//            Member member2 = new Member();
+//            member2.setName("member2");
+//            member2.setHomeAddress(copyAddress);
+//
+//            System.out.println("========================");
+//            System.out.println(address.equals(copyAddress));
+//            System.out.println("========================");
+//
+//            em.persist(member2);
+
+
+            /*
+            * 값 타입 컬렉션 사용 예제
+            * member 만 persist 해도 모두 반영됨(persist 됨)
+            * 영속성 전이, 고아 객체 제거 기능이 포함되어 있다고 볼 수 있음
+             */
             Member member = new Member();
             member.setName("member1");
-            member.setPeriod(new Period(LocalDateTime.of(1996,5,25,19,30), LocalDateTime.now()));
-            member.setHomeAddress(new Address("서울","독막로","20길"));
+            member.setHomeAddress(new Address("homeCity", "homeStreet", "10000"));
+            member.getFavoriteFoods().add("치킨");
+            member.getFavoriteFoods().add("족발");
+
+            member.getAddressHistory().add(new AddressEntity("old1", "old1", "10000"));
+            member.getAddressHistory().add(new AddressEntity("old2", "old2", "10000"));
+
             em.persist(member);
 
+            em.flush();
+            em.clear();
+
 
             /*
-            값 타입을 공유해버리면, 의도치 않게 문제가 발생할 수 있음, 찾기 매우 어려움
-            그때그때 값을 복사해서 사용하자!
-            수정자를 막았으면, 수정할 때 마다 새로운 객체를 생성해서 넣어주자
+            * 값 타입 컬렉션의 경우, 지연 로딩 전략 사용!!(그냥 값 타입은 X)
              */
-            Address address = new Address("서울", "길거리", "10000");
-            Member member1 = new Member();
-            member1.setName("member1");
-            member1.setHomeAddress(address);
+            System.out.println("================START==================");
+            Member findMember = em.find(Member.class, member.getId());
+            System.out.println("================ END ==================");
 
-            em.persist(member1);
+            Set<String> favoriteFoods = findMember.getFavoriteFoods();
+            System.out.println("=========================================");
+            for(String favoriteFood : favoriteFoods){
+                System.out.println("favorite food = " + favoriteFood);
+            }
+            List<AddressEntity> addressHistory = findMember.getAddressHistory();
+            System.out.println("=========================================");
+            for(AddressEntity address : addressHistory){
+                System.out.println("address = " + address.getAddress().getCity());
+            }
 
             /*
-            값을 복사한 새로운 객체 생성
+            * 값 타입 수정
+            * 값 타입의 수정은 객체 자체를 바꿔야 안전하다.
+            * 값 타입 컬렉션의 경우도 마찬가지 ! 지우고 새로 넣자 !
+            * 값 타입은 좋은 방법이 아님, 굳이 사용할 필요 없음 !
              */
-            Address copyAddress = new Address(address.getCity(), address.getStreet(), address.getZipcode());
-            Member member2 = new Member();
-            member2.setName("member2");
-            member2.setHomeAddress(copyAddress);
+            findMember.setHomeAddress(new Address("newCity","newStreet","newZipcode"));
 
-            System.out.println("========================");
-            System.out.println(address.equals(copyAddress));
-            System.out.println("========================");
 
-            em.persist(member2);
+            findMember.getFavoriteFoods().remove("치킨");
+            findMember.getFavoriteFoods().add("피자");
+
+            /*
+            * 대부분의 자바 컬렉션은 내용물을 찾을 때 ,equals or hashcode 사용! 꼭 구현 잘 해두자!
+             */
+            findMember.getAddressHistory().remove(new AddressEntity("old1", "old1", "10000"));
+            findMember.getAddressHistory().add(new AddressEntity("newCity1","newStreet1","newZipcode1"));
+
+
 
             tx.commit();
         }catch (Exception e){
