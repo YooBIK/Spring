@@ -26,25 +26,30 @@ public class Address {
         return city;
     }
 
-    public Address setCity(String city) {
-        this.city = city;
-        return this;
-    }
 
     public String getStreet() {
         return street;
-    }
-
-    public Address setStreet(String street) {
-        this.street = street;
-        return this;
     }
 
     public String getZipcode() {
         return zipcode;
     }
 
-    public Address setZipcode(String zipcode) {
+    /*
+    같은 값타입(객체)를 가리키게 되면 예기치 못한 부작용이 발생할 수 있음!! 원하지 않는 변경이 생김
+    그걸 막으려면 수정자(Setter)를 없애거나, private 으로 선언! 
+     */
+    private Address setCity(String city) {
+        this.city = city;
+        return this;
+    }
+
+    private Address setStreet(String street) {
+        this.street = street;
+        return this;
+    }
+
+    private Address setZipcode(String zipcode) {
         this.zipcode = zipcode;
         return this;
     }
