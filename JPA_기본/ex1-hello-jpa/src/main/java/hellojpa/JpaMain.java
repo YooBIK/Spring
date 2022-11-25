@@ -220,6 +220,7 @@ public class JpaMain {
             /*
             값 타입을 공유해버리면, 의도치 않게 문제가 발생할 수 있음, 찾기 매우 어려움
             그때그때 값을 복사해서 사용하자!
+            수정자를 막았으면, 수정할 때 마다 새로운 객체를 생성해서 넣어주자
              */
             Address address = new Address("서울", "길거리", "10000");
             Member member1 = new Member();
@@ -228,18 +229,19 @@ public class JpaMain {
 
             em.persist(member1);
 
-
             /*
             값을 복사한 새로운 객체 생성
              */
-            Address copyAddress = new Address(address.getCity(), address.getCity(), address.getZipcode());
+            Address copyAddress = new Address(address.getCity(), address.getStreet(), address.getZipcode());
             Member member2 = new Member();
             member2.setName("member2");
             member2.setHomeAddress(copyAddress);
 
-            em.persist(member2);
+            System.out.println("========================");
+            System.out.println(address.equals(copyAddress));
+            System.out.println("========================");
 
-            member1.getHomeAddress().setCity("제주");
+            em.persist(member2);
 
             tx.commit();
         }catch (Exception e){
