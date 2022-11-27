@@ -247,63 +247,87 @@ public class JpaMain {
 //            em.persist(member2);
 
 
+//            /*
+//            * 값 타입 컬렉션 사용 예제
+//            * member 만 persist 해도 모두 반영됨(persist 됨)
+//            * 영속성 전이, 고아 객체 제거 기능이 포함되어 있다고 볼 수 있음
+//             */
+//            Member member = new Member();
+//            member.setName("member1");
+//            member.setHomeAddress(new Address("homeCity", "homeStreet", "10000"));
+//            member.getFavoriteFoods().add("치킨");
+//            member.getFavoriteFoods().add("족발");
+//
+//            member.getAddressHistory().add(new AddressEntity("old1", "old1", "10000"));
+//            member.getAddressHistory().add(new AddressEntity("old2", "old2", "10000"));
+//
+//            em.persist(member);
+//
+//            em.flush();
+//            em.clear();
+//
+//
+//            /*
+//            * 값 타입 컬렉션의 경우, 지연 로딩 전략 사용!!(그냥 값 타입은 X)
+//             */
+//            System.out.println("================START==================");
+//            Member findMember = em.find(Member.class, member.getId());
+//            System.out.println("================ END ==================");
+//
+//            Set<String> favoriteFoods = findMember.getFavoriteFoods();
+//            System.out.println("=========================================");
+//            for(String favoriteFood : favoriteFoods){
+//                System.out.println("favorite food = " + favoriteFood);
+//            }
+//            List<AddressEntity> addressHistory = findMember.getAddressHistory();
+//            System.out.println("=========================================");
+//            for(AddressEntity address : addressHistory){
+//                System.out.println("address = " + address.getAddress().getCity());
+//            }
+//
+//            /*
+//            * 값 타입 수정
+//            * 값 타입의 수정은 객체 자체를 바꿔야 안전하다.
+//            * 값 타입 컬렉션의 경우도 마찬가지 ! 지우고 새로 넣자 !
+//            * 값 타입은 좋은 방법이 아님, 굳이 사용할 필요 없음 !
+//             */
+//            findMember.setHomeAddress(new Address("newCity","newStreet","newZipcode"));
+//
+//
+//            findMember.getFavoriteFoods().remove("치킨");
+//            findMember.getFavoriteFoods().add("피자");
+//
+//            /*
+//            * 대부분의 자바 컬렉션은 내용물을 찾을 때 ,equals or hashcode 사용! 꼭 구현 잘 해두자!
+//             */
+//            findMember.getAddressHistory().remove(new AddressEntity("old1", "old1", "10000"));
+//            findMember.getAddressHistory().add(new AddressEntity("newCity1","newStreet1","newZipcode1"));
+
+
             /*
-            * 값 타입 컬렉션 사용 예제
-            * member 만 persist 해도 모두 반영됨(persist 됨)
-            * 영속성 전이, 고아 객체 제거 기능이 포함되어 있다고 볼 수 있음
+            * JPQL : SQL을 추상화 !! 테이블이 아닌 엔티티를 대상으로 하는 쿼리(객체 지향 쿼라)
+            *        특정 DB에 의존 X
              */
+            List<Member> resultList = em.createQuery("select m from Member m where m.name like '%member%'", Member.class).getResultList();
+            for(Member m : resultList){
+                System.out.println(m.getName());
+            }
+
             Member member = new Member();
             member.setName("member1");
-            member.setHomeAddress(new Address("homeCity", "homeStreet", "10000"));
-            member.getFavoriteFoods().add("치킨");
-            member.getFavoriteFoods().add("족발");
-
-            member.getAddressHistory().add(new AddressEntity("old1", "old1", "10000"));
-            member.getAddressHistory().add(new AddressEntity("old2", "old2", "10000"));
-
             em.persist(member);
 
-            em.flush();
-            em.clear();
-
-
             /*
-            * 값 타입 컬렉션의 경우, 지연 로딩 전략 사용!!(그냥 값 타입은 X)
+            * 순수 Query도 사용 가능!
+            * flush,commit 그리고 Entity Manager가 쿼리를 실행할 때, 영속성 컨텍스트의 쿼리들을 실행함.
+            * 그러므로 JPA에서 제공하는 기능이 아닌 다른 방법(JDBC, MYBATIS 등)으로 DB에 접근할 때는 미리 flush해서 DB에 반영시켜 둬야함!!
              */
-            System.out.println("================START==================");
-            Member findMember = em.find(Member.class, member.getId());
-            System.out.println("================ END ==================");
+            List<Member> nativeQueryResultList = em.createNativeQuery("select * from MEMBER", Member.class).getResultList();
 
-            Set<String> favoriteFoods = findMember.getFavoriteFoods();
-            System.out.println("=========================================");
-            for(String favoriteFood : favoriteFoods){
-                System.out.println("favorite food = " + favoriteFood);
+
+            for(Member m : nativeQueryResultList){
+                System.out.println(m.getName());
             }
-            List<AddressEntity> addressHistory = findMember.getAddressHistory();
-            System.out.println("=========================================");
-            for(AddressEntity address : addressHistory){
-                System.out.println("address = " + address.getAddress().getCity());
-            }
-
-            /*
-            * 값 타입 수정
-            * 값 타입의 수정은 객체 자체를 바꿔야 안전하다.
-            * 값 타입 컬렉션의 경우도 마찬가지 ! 지우고 새로 넣자 !
-            * 값 타입은 좋은 방법이 아님, 굳이 사용할 필요 없음 !
-             */
-            findMember.setHomeAddress(new Address("newCity","newStreet","newZipcode"));
-
-
-            findMember.getFavoriteFoods().remove("치킨");
-            findMember.getFavoriteFoods().add("피자");
-
-            /*
-            * 대부분의 자바 컬렉션은 내용물을 찾을 때 ,equals or hashcode 사용! 꼭 구현 잘 해두자!
-             */
-            findMember.getAddressHistory().remove(new AddressEntity("old1", "old1", "10000"));
-            findMember.getAddressHistory().add(new AddressEntity("newCity1","newStreet1","newZipcode1"));
-
-
 
             tx.commit();
         }catch (Exception e){
