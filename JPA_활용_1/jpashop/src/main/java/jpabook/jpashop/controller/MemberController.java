@@ -24,15 +24,15 @@ public class MemberController {
     private final MemberService memberService;
 
     @GetMapping("/new")
-    public String createForm(Model model){
-        model.addAttribute("memberForm",new MemberForm());
+    public String createForm(Model model) {
+        model.addAttribute("memberForm", new MemberForm());
         return "members/createMemberForm";
     }
 
     @PostMapping("/new")
-    public String create(@Valid MemberForm memberForm, BindingResult result){
+    public String create(@Valid MemberForm memberForm, BindingResult result) {
 
-        if(result.hasErrors()){
+        if (result.hasErrors()) {
             return "members/createMemberForm";
         }
 
@@ -45,9 +45,9 @@ public class MemberController {
     }
 
     @GetMapping("")
-    public String list(Model model){
+    public String list(Model model) {
         List<Member> members = memberService.findMembers();
-        model.addAttribute("members",members);
+        model.addAttribute("members", members);
         Item item = new Book();
 
         return "members/memberList";

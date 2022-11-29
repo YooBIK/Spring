@@ -1,6 +1,5 @@
 package jpabook.jpashop.domain;
 
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,7 +12,8 @@ import java.util.List;
 @Setter
 public class Member {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     @Column(name = "member_id")
     private Long id;
 

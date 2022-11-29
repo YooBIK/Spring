@@ -23,10 +23,10 @@ public class Order {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @OneToMany(mappedBy = "order",cascade =CascadeType.ALL)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems = new ArrayList<>();
 
-    @OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "delivery_id")
     private Delivery delivery;
 
@@ -39,27 +39,26 @@ public class Order {
         #연관 관계 편의 메소드
         양방향 관계에서 한번에 양쪽 다 세팅
      */
-    public void setMember(Member member){
-        this.member =member;
+    public void setMember(Member member) {
+        this.member = member;
         member.getOrders().add(this);
     }
-
-    public void addOrderItem(OrderItem orderItem){
+    public void addOrderItem(OrderItem orderItem) {
         this.orderItems.add(orderItem);
         orderItem.setOrder(this);
     }
 
-    public void setDelivery(Delivery delivery){
+    public void setDelivery(Delivery delivery) {
         this.delivery = delivery;
         delivery.setOrder(this);
     }
 
     // 생성 메서드
-    public static Order createOrder(Member member, Delivery delivery, OrderItem... orderItems){
+    public static Order createOrder(Member member, Delivery delivery, OrderItem... orderItems) {
         Order order = new Order();
         order.setMember(member);
         order.setDelivery(delivery);
-        for(OrderItem orderItem : orderItems){
+        for (OrderItem orderItem : orderItems) {
             order.addOrderItem(orderItem);
         }
         order.setStatus(OrderStatus.ORDER);
@@ -72,12 +71,12 @@ public class Order {
     /*
     주문 취소
      */
-    public void cancel(){
-        if(delivery.getStatus() == DeliveryStatus.COMP){
+    public void cancel() {
+        if (delivery.getStatus() == DeliveryStatus.COMP) {
             throw new IllegalStateException("이미 배송 완료된 상품입니다.");
         }
         this.setStatus(OrderStatus.CANCEL);
-        for(OrderItem orderItem : orderItems){
+        for (OrderItem orderItem : orderItems) {
             orderItem.cancel();
         }
     }
@@ -87,13 +86,11 @@ public class Order {
     /*
     전체 주문 가격 조회
      */
-    public int getTotalPrice(){
+    public int getTotalPrice() {
         int totalPrice = 0;
-        for(OrderItem orderItem : orderItems){
-            totalPrice+= orderItem.getTotalPrice();
+        for (OrderItem orderItem : orderItems) {
+            totalPrice += orderItem.getTotalPrice();
         }
         return totalPrice;
     }
-
-
 }

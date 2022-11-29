@@ -3,7 +3,6 @@ package jpabook.jpashop.controller;
 import jpabook.jpashop.domain.item.Book;
 import jpabook.jpashop.domain.item.Item;
 import jpabook.jpashop.service.ItemService;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,27 +18,27 @@ public class ItemController {
     private final ItemService itemService;
 
     @GetMapping("/new")
-    public String createForm(Model model){
-        model.addAttribute("form",new BookForm());
+    public String createForm(Model model) {
+        model.addAttribute("form", new BookForm());
         return "items/createItemForm";
     }
 
     @PostMapping("/new")
-    public String create(BookForm bookForm){
+    public String create(BookForm bookForm) {
         Book book = Book.createBook(bookForm.getName(), bookForm.getPrice(), bookForm.getStockQuantity(), bookForm.getAuthor(), bookForm.getIsbn());
         itemService.save(book);
         return "redirect:/";
     }
 
     @GetMapping("")
-    public String list(Model model){
+    public String list(Model model) {
         List<Item> items = itemService.findItems();
-        model.addAttribute("items",items);
+        model.addAttribute("items", items);
         return "items/itemList";
     }
 
     @GetMapping("/{itemId}/edit")
-    public String updateItemForm(@PathVariable Long itemId, Model model){
+    public String updateItemForm(@PathVariable Long itemId, Model model) {
         Book item = (Book) itemService.findOne(itemId);
         BookForm bookForm = new BookForm();
         bookForm.setId(item.getId());
@@ -53,10 +52,8 @@ public class ItemController {
     }
 
     @PostMapping("/{itemId}/edit")
-    public String updateItem(@PathVariable Long itemId, @ModelAttribute("form") BookForm bookForm){
-
+    public String updateItem(@PathVariable Long itemId, @ModelAttribute("form") BookForm bookForm) {
         itemService.updateItem(itemId, bookForm.getName(), bookForm.getPrice(), bookForm.getStockQuantity());
         return "redirect:/items";
-
     }
 }

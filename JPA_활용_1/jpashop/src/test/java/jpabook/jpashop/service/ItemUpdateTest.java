@@ -17,9 +17,7 @@ public class ItemUpdateTest {
     EntityManager em;
 
     @Test
-    public void updateTest(){
+    public void updateTest() {
         Book book = em.find(Book.class, 1L);
-
-
     }
 }
