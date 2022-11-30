@@ -9,9 +9,14 @@ public class Member {
     private String userName;
     private int age;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "TEAM_ID")
     private Team team;
+
+    public void changeTeam(Team team){
+        this.team = team;
+        team.getMembers().add(this);
+    }
 
     public Long getId() {
         return id;
@@ -41,9 +46,9 @@ public class Member {
     }
 
     /*
-    toString 매서드를 정의할 때,
-    양방향 연관관계인 필드를 추가하면, 무한 루프에 빠지는 등 에러 발생 가능!! 주의하자 !!
-     */
+        toString 매서드를 정의할 때,
+        양방향 연관관계인 필드를 추가하면, 무한 루프에 빠지는 등 에러 발생 가능!! 주의하자 !!
+         */
     @Override
     public String toString() {
         return "Member{" +

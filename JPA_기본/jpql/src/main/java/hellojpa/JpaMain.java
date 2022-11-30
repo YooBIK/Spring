@@ -115,33 +115,63 @@ public class JpaMain {
 //                System.out.println("age : " + m.getAge());
 //            }
 
+//            /*
+//             * Paging
+//             * - setFirstResult, setMaxResults 메서드를 사용해서 페이징을 쉽게 처리할 수 있다.
+//             * - 각 DB 방언으로 페이징을 처리함
+//             *      - H2, MYSQL은 limit, offset을 사용
+//             *      - Oracle은 rownum을 사용한 복잡한 쿼리를 자동으로 생성 및 실행해줌!!
+//             */
+//
+//            for (int i = 0; i < 100; i++) {
+//                Member member = new Member();
+//                member.setUserName("member" + i);
+//                member.setAge(i);
+//                em.persist(member);
+//            }
+//
+//            em.flush();
+//            em.clear();
+//
+//            List<Member> resultList = em.createQuery("select m from Member m order by m.age desc", Member.class)
+//                    .setFirstResult(20)
+//                    .setMaxResults(10)
+//                    .getResultList();
+//
+//            System.out.println("resultList.size() = " + resultList.size());
+//            for (Member m : resultList) {
+//                System.out.println("member = " + m);
+//            }
+
             /*
-             * Paging
-             * - setFirstResult, setMaxResults 메서드를 사용해서 페이징을 쉽게 처리할 수 있다.
-             * - 각 DB 방언으로 페이징을 처리함
-             *      - H2, MYSQL은 limit, offset을 사용
-             *      - Oracle은 rownum을 사용한 복잡한 쿼리를 자동으로 생성 및 실행해줌!!
+             * Join
              */
 
-            for (int i = 0; i < 100; i++) {
-                Member member = new Member();
-                member.setUserName("member" + i);
-                member.setAge(i);
-                em.persist(member);
-            }
+            Team team = new Team();
+            team.setName("teamA");
+            em.persist(team);
+
+            Member member = new Member();
+            member.setUserName("memberA");
+            member.setAge(10);
+            member.changeTeam(team);
+
+            em.persist(member);
 
             em.flush();
             em.clear();
 
-            List<Member> resultList = em.createQuery("select m from Member m order by m.age desc", Member.class)
-                    .setFirstResult(20)
-                    .setMaxResults(10)
-                    .getResultList();
+            //Inner Join
+            String innerJoinJPQL = "select m from Member m inner join m.team t"; // inner 생략 가능
+            List<Member> innerJoinResult = em.createQuery(innerJoinJPQL, Member.class).getResultList();
 
-            System.out.println("resultList.size() = " + resultList.size());
-            for (Member m : resultList) {
-                System.out.println("member = " + m);
-            }
+            //Outer Join
+            String outerJoinJPQL = "select m from Member m left outer join m.team t"; // outer 생략 가능
+            List<Member> outerJoinResult = em.createQuery(outerJoinJPQL, Member.class).getResultList();
+
+            //Theta Join
+            String thetaJoinJPQL = "select m from Member m,Team t where m.userName = t.name";
+            em.createQuery(thetaJoinJPQL, Member.class).getResultList();
 
 
             transaction.commit();
