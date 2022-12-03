@@ -16,12 +16,20 @@ public class JpaMain {
 
         try {
 
-//            Member member = new Member();
-//            member.setUserName("memberA");
-//            em.persist(member);
-//
-//            em.flush();
-//            em.clear();
+            Team team = new Team();
+            team.setName("teamA");
+            em.persist(team);
+
+            Member member = new Member();
+            member.setUserName("memberA");
+            member.setAge(10);
+            member.setType(MemberType.ADMIN);
+            member.changeTeam(team);
+
+            em.persist(member);
+
+            em.flush();
+            em.clear();
 //
 //            /*
 //            * "select m from Member as m where m.age > 18"
@@ -67,12 +75,6 @@ public class JpaMain {
 //            *   - distinct로 중복 제거 가능!
 //            */
 //
-//            Member member = new Member();
-//            member.setUserName("memberA");
-//            em.persist(member);
-//
-//            em.flush();
-//            em.clear();
 //
 //            /*
 //            * Entity 프로젝션
@@ -148,20 +150,6 @@ public class JpaMain {
 //             * Join
 //             */
 //
-//            Team team = new Team();
-//            team.setName("teamA");
-//            em.persist(team);
-//
-//            Member member = new Member();
-//            member.setUserName("memberA");
-//            member.setAge(10);
-//            member.changeTeam(team);
-//
-//            em.persist(member);
-//
-//            em.flush();
-//            em.clear();
-//
 //            //Inner Join
 //            String innerJoinJPQL = "select m from Member m inner join m.team t"; // inner 생략 가능
 //            List<Member> innerJoinResult = em.createQuery(innerJoinJPQL, Member.class).getResultList();
@@ -182,37 +170,57 @@ public class JpaMain {
             *   - 조인을 활용하자, 그래도 안된다면 Native Query, 혹은 각각의 Query의 결과를 Java Application에서 조합 및 해결
              */
 
+//            /*
+//            * JPQL 타입 표현
+//            * - ENUM 클래스의 경우 패키지 경로를 모두 명시해줘야함!!
+//            * - 그래서 보통 파라미터 바인딩을 해서 간략화함!
+//            *
+//             */
+//
+//            String jpql1 = "select m.userName, 'HELLO', true, m.type from Member m where m.type = hellojpa.MemberType.ADMIN";
+//            String jpql2 = "select m.userName, 'HELLO', true, m.type from Member m where m.type = :memberType";
+//            List<Object[]> resultList1 = em.createQuery(jpql1).getResultList();
+//            List<Object[]> resultList2 = em.createQuery(jpql2).setParameter("memberType",MemberType.ADMIN).getResultList();
+//
+//            for(Object[] objects : resultList2){
+//                System.out.println("objects[0] = " + objects[0]);
+//                System.out.println("objects[1] = " + objects[1]);
+//                System.out.println("objects[2] = " + objects[2]);
+//                System.out.println("objects[3] = " + objects[3]);
+//            }
+
             /*
-            * JPQL 타입 표현
-            * - ENUM 클래스의 경우 패키지 경로를 모두 명시해줘야함!!
-            * - 그래서 보통 파라미터 바인딩을 해서 간략화함!
-            *
+            * CASE 식
              */
-            Team team = new Team();
-            team.setName("teamA");
-            em.persist(team);
+            String caseJpql = "select " +
+                    "case when m.age <= 10 then '학생요금' " +
+                    "when m.age >= 60 then '경로 요금' " +
+                    "else '일반요금' end " +
+                    "from Member m ";
+            List<String> resultList1 = em.createQuery(caseJpql, String.class).getResultList();
+            for (String s : resultList1){
+                System.out.println("s = " + s);
+            }
 
-            Member member = new Member();
-            member.setUserName("memberA");
-            member.setAge(10);
-            member.setType(MemberType.ADMIN);
-            member.changeTeam(team);
+            /*
+            * Coalesce
+            * 하나씩 조회해서 null이 아닌 값이 있으면 반환
+            *   - 이 경우 m.userName을 다 뒤져보고 있으면 그 값을 반환하고 없으면 '이름 없는 회원' 이 반환됨
+             */
+            String coalesceJpql = "select coalesce(m.userName,'이름 없는 회원') from Member m";
+            List<String> resultList2 = em.createQuery(coalesceJpql, String.class).getResultList();
+            for(String s : resultList2){
+                System.out.println("s = " + s);
+            }
 
-            em.persist(member);
-
-            em.flush();
-            em.clear();
-
-            String jpql1 = "select m.userName, 'HELLO', true, m.type from Member m where m.type = hellojpa.MemberType.ADMIN";
-            String jpql2 = "select m.userName, 'HELLO', true, m.type from Member m where m.type = :memberType";
-            List<Object[]> resultList1 = em.createQuery(jpql1).getResultList();
-            List<Object[]> resultList2 = em.createQuery(jpql2).setParameter("memberType",MemberType.ADMIN).getResultList();
-
-            for(Object[] objects : resultList2){
-                System.out.println("objects[0] = " + objects[0]);
-                System.out.println("objects[1] = " + objects[1]);
-                System.out.println("objects[2] = " + objects[2]);
-                System.out.println("objects[3] = " + objects[3]);
+            /*
+            * NullIf
+            * 두 값이 일치하면 null 반환 다르면 첫째값 반환
+             */
+            String nullIfJpql = "select nullif(m.userName,'memberA') from Member m ";
+            List<String> resultList3 = em.createQuery(nullIfJpql, String.class).getResultList();
+            for(String s : resultList3){
+                System.out.println("s = " + s);
             }
 
             transaction.commit();
