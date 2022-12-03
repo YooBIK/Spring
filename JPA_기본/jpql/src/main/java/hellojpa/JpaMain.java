@@ -2,6 +2,7 @@ package hellojpa;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Objects;
 
 public class JpaMain {
 
@@ -143,10 +144,50 @@ public class JpaMain {
 //                System.out.println("member = " + m);
 //            }
 
+//            /*
+//             * Join
+//             */
+//
+//            Team team = new Team();
+//            team.setName("teamA");
+//            em.persist(team);
+//
+//            Member member = new Member();
+//            member.setUserName("memberA");
+//            member.setAge(10);
+//            member.changeTeam(team);
+//
+//            em.persist(member);
+//
+//            em.flush();
+//            em.clear();
+//
+//            //Inner Join
+//            String innerJoinJPQL = "select m from Member m inner join m.team t"; // inner 생략 가능
+//            List<Member> innerJoinResult = em.createQuery(innerJoinJPQL, Member.class).getResultList();
+//
+//            //Outer Join
+//            String outerJoinJPQL = "select m from Member m left outer join m.team t"; // outer 생략 가능
+//            List<Member> outerJoinResult = em.createQuery(outerJoinJPQL, Member.class).getResultList();
+//
+//            //Theta Join
+//            String thetaJoinJPQL = "select m from Member m,Team t where m.userName = t.name";
+//            em.createQuery(thetaJoinJPQL, Member.class).getResultList();
+
             /*
-             * Join
+            * Sub Query
+            * 대부분의 기능 제공
+            * SELECT(JPA는 지원 X,하이버네이트에서 지원), WHERE, HAVING 절에서 서브쿼리 가능
+            *   - FROM 절은 현재 불가능
+            *   - 조인을 활용하자, 그래도 안된다면 Native Query, 혹은 각각의 Query의 결과를 Java Application에서 조합 및 해결
              */
 
+            /*
+            * JPQL 타입 표현
+            * - ENUM 클래스의 경우 패키지 경로를 모두 명시해줘야함!!
+            * - 그래서 보통 파라미터 바인딩을 해서 간략화함!
+            *
+             */
             Team team = new Team();
             team.setName("teamA");
             em.persist(team);
@@ -154,6 +195,7 @@ public class JpaMain {
             Member member = new Member();
             member.setUserName("memberA");
             member.setAge(10);
+            member.setType(MemberType.ADMIN);
             member.changeTeam(team);
 
             em.persist(member);
@@ -161,18 +203,17 @@ public class JpaMain {
             em.flush();
             em.clear();
 
-            //Inner Join
-            String innerJoinJPQL = "select m from Member m inner join m.team t"; // inner 생략 가능
-            List<Member> innerJoinResult = em.createQuery(innerJoinJPQL, Member.class).getResultList();
+            String jpql1 = "select m.userName, 'HELLO', true, m.type from Member m where m.type = hellojpa.MemberType.ADMIN";
+            String jpql2 = "select m.userName, 'HELLO', true, m.type from Member m where m.type = :memberType";
+            List<Object[]> resultList1 = em.createQuery(jpql1).getResultList();
+            List<Object[]> resultList2 = em.createQuery(jpql2).setParameter("memberType",MemberType.ADMIN).getResultList();
 
-            //Outer Join
-            String outerJoinJPQL = "select m from Member m left outer join m.team t"; // outer 생략 가능
-            List<Member> outerJoinResult = em.createQuery(outerJoinJPQL, Member.class).getResultList();
-
-            //Theta Join
-            String thetaJoinJPQL = "select m from Member m,Team t where m.userName = t.name";
-            em.createQuery(thetaJoinJPQL, Member.class).getResultList();
-
+            for(Object[] objects : resultList2){
+                System.out.println("objects[0] = " + objects[0]);
+                System.out.println("objects[1] = " + objects[1]);
+                System.out.println("objects[2] = " + objects[2]);
+                System.out.println("objects[3] = " + objects[3]);
+            }
 
             transaction.commit();
         } catch (Exception e) {
