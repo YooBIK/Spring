@@ -1,6 +1,7 @@
 package hellojpa;
 
 import javax.persistence.*;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -189,39 +190,83 @@ public class JpaMain {
 //                System.out.println("objects[3] = " + objects[3]);
 //            }
 
+//            /*
+//            * CASE 식
+//             */
+//            String caseJpql = "select " +
+//                    "case when m.age <= 10 then '학생요금' " +
+//                    "when m.age >= 60 then '경로 요금' " +
+//                    "else '일반요금' end " +
+//                    "from Member m ";
+//            List<String> resultList1 = em.createQuery(caseJpql, String.class).getResultList();
+//            for (String s : resultList1){
+//                System.out.println("s = " + s);
+//            }
+//
+//            /*
+//            * Coalesce
+//            * 하나씩 조회해서 null이 아닌 값이 있으면 반환
+//            *   - 이 경우 m.userName을 다 뒤져보고 있으면 그 값을 반환하고 없으면 '이름 없는 회원' 이 반환됨
+//             */
+//            String coalesceJpql = "select coalesce(m.userName,'이름 없는 회원') from Member m";
+//            List<String> resultList2 = em.createQuery(coalesceJpql, String.class).getResultList();
+//            for(String s : resultList2){
+//                System.out.println("s = " + s);
+//            }
+//
+//            /*
+//            * NullIf
+//            * 두 값이 일치하면 null 반환 다르면 첫째값 반환
+//             */
+//            String nullIfJpql = "select nullif(m.userName,'memberA') from Member m ";
+//            List<String> resultList3 = em.createQuery(nullIfJpql, String.class).getResultList();
+//            for(String s : resultList3){
+//                System.out.println("s = " + s);
+//            }
+
             /*
-            * CASE 식
+            * 경로 표현식
              */
-            String caseJpql = "select " +
-                    "case when m.age <= 10 then '학생요금' " +
-                    "when m.age >= 60 then '경로 요금' " +
-                    "else '일반요금' end " +
-                    "from Member m ";
-            List<String> resultList1 = em.createQuery(caseJpql, String.class).getResultList();
-            for (String s : resultList1){
+            Team newTeam = new Team();
+            newTeam.setName("newTeam");
+            em.persist(newTeam);
+
+            Member newMember = new Member();
+            newMember.setUserName("newMember");
+            newMember.setTeam(newTeam);
+            em.persist(newMember);
+
+            /*
+             * 상태 필드에서는 더이상 탐색이 불가능 ex) m.userName.xxx -> 불가능
+             * 상태 필드에 대한 jpql은 예상한대로 SQL이 생성됨
+             */
+            String jpql1 = "select m.userName from Member m";
+            List<String> resultList1 = em.createQuery(jpql1, String.class).getResultList();
+            for(String s : resultList1){
                 System.out.println("s = " + s);
             }
 
             /*
-            * Coalesce
-            * 하나씩 조회해서 null이 아닌 값이 있으면 반환
-            *   - 이 경우 m.userName을 다 뒤져보고 있으면 그 값을 반환하고 없으면 '이름 없는 회원' 이 반환됨
+             * 단일 값 연관 경로의 경우 join이 발생한다. 또한 추가 탐색이 가능 ex)m.team.name
+             * 이를 묵시적 내부 조인이라고 한다.
+             * 되도록 묵시적 내부 조인이 발생하지 않도록 JPQL을 작성해야 한다.
+             *  - Query를 추적하는것이 굉장히 어렵고, 성능을 위한 튜닝이 어렵다.
              */
-            String coalesceJpql = "select coalesce(m.userName,'이름 없는 회원') from Member m";
-            List<String> resultList2 = em.createQuery(coalesceJpql, String.class).getResultList();
-            for(String s : resultList2){
-                System.out.println("s = " + s);
+            String jpql2 = "select m.team from Member m";
+            List<Team> resultList2 = em.createQuery(jpql2, Team.class).getResultList();
+            for(Team t : resultList2){
+                System.out.println("t.getName() = " + t.getName());
             }
 
             /*
-            * NullIf
-            * 두 값이 일치하면 null 반환 다르면 첫째값 반환
+             * 컬렉션 값 연관 경로도 마찬가지로 묵시적인 내부 조인이 발생한다.
+             * 하지만 이후 탐색을 할 수 없음
+             *  why? 컬렉션에서 어떤 값의 어떤 필드인지를 명시하는 것은 모호함 그래서 하이버네이트는 제약을 걸어둠
+             *  size는 가능
              */
-            String nullIfJpql = "select nullif(m.userName,'memberA') from Member m ";
-            List<String> resultList3 = em.createQuery(nullIfJpql, String.class).getResultList();
-            for(String s : resultList3){
-                System.out.println("s = " + s);
-            }
+            String jpql3 = "select t.members from Team t";
+            List<Collection> resultList3 = em.createQuery(jpql3, Collection.class).getResultList();
+            System.out.println("resultList3 = " + resultList3);
 
             transaction.commit();
         } catch (Exception e) {
