@@ -325,7 +325,7 @@ public class JpaMain {
             }
 
             /*
-             * 컬렉션도 fetch join 할 수 있음
+             * 컬렉션도 fetch join 할 수 있음 // 하나의 컬렉션만 페치 조인 가능하다 !!
              * DB 관점에서는 한 팀에 여러 멤버가 있으면, 여러 행으로 표현하는 방법 밖에 없다.
              *  ex) 한 팀에 소속된 회원이 3명이면 SQL의 결과는 3줄이 나온다. 그렇기에 JPQL의 결과인 resultList3의 크기는 3이 나온다!!
              *  -> distinct를 사용
