@@ -224,49 +224,56 @@ public class JpaMain {
 //                System.out.println("s = " + s);
 //            }
 
-            /*
-            * 경로 표현식
-             */
-            Team newTeam = new Team();
-            newTeam.setName("newTeam");
-            em.persist(newTeam);
+//            /*
+//            * 경로 표현식
+//             */
+//            Team newTeam = new Team();
+//            newTeam.setName("newTeam");
+//            em.persist(newTeam);
+//
+//            Member newMember = new Member();
+//            newMember.setUserName("newMember");
+//            newMember.setTeam(newTeam);
+//            em.persist(newMember);
+//
+//            /*
+//             * 상태 필드에서는 더이상 탐색이 불가능 ex) m.userName.xxx -> 불가능
+//             * 상태 필드에 대한 jpql은 예상한대로 SQL이 생성됨
+//             */
+//            String jpql1 = "select m.userName from Member m";
+//            List<String> resultList1 = em.createQuery(jpql1, String.class).getResultList();
+//            for(String s : resultList1){
+//                System.out.println("s = " + s);
+//            }
+//
+//            /*
+//             * 단일 값 연관 경로의 경우 join이 발생한다. 또한 추가 탐색이 가능 ex)m.team.name
+//             * 이를 묵시적 내부 조인이라고 한다.
+//             * 되도록 묵시적 내부 조인이 발생하지 않도록 JPQL을 작성해야 한다.
+//             *  - Query를 추적하는것이 굉장히 어렵고, 성능을 위한 튜닝이 어렵다.
+//             */
+//            String jpql2 = "select m.team from Member m";
+//            List<Team> resultList2 = em.createQuery(jpql2, Team.class).getResultList();
+//            for(Team t : resultList2){
+//                System.out.println("t.getName() = " + t.getName());
+//            }
+//
+//            /*
+//             * 컬렉션 값 연관 경로도 마찬가지로 묵시적인 내부 조인이 발생한다.
+//             * 하지만 이후 탐색을 할 수 없음
+//             *  why? 컬렉션에서 어떤 값의 어떤 필드인지를 명시하는 것은 모호함 그래서 하이버네이트는 제약을 걸어둠
+//             *  size는 가능
+//             */
+//            String jpql3 = "select t.members from Team t";
+//            List<Collection> resultList3 = em.createQuery(jpql3, Collection.class).getResultList();
+//            System.out.println("resultList3 = " + resultList3);
 
-            Member newMember = new Member();
-            newMember.setUserName("newMember");
-            newMember.setTeam(newTeam);
-            em.persist(newMember);
-
             /*
-             * 상태 필드에서는 더이상 탐색이 불가능 ex) m.userName.xxx -> 불가능
-             * 상태 필드에 대한 jpql은 예상한대로 SQL이 생성됨
+            * Fetch Join # 굉장히 중요함!!
+            * - JPQL에서 성능 최적화를 위해 제공하는 기능(SQL에는 존재하지 않음)
+            * - 연관된 엔티티와 컬렉션을 SQL 한번으로 함께 조회하는 기능
              */
-            String jpql1 = "select m.userName from Member m";
-            List<String> resultList1 = em.createQuery(jpql1, String.class).getResultList();
-            for(String s : resultList1){
-                System.out.println("s = " + s);
-            }
 
-            /*
-             * 단일 값 연관 경로의 경우 join이 발생한다. 또한 추가 탐색이 가능 ex)m.team.name
-             * 이를 묵시적 내부 조인이라고 한다.
-             * 되도록 묵시적 내부 조인이 발생하지 않도록 JPQL을 작성해야 한다.
-             *  - Query를 추적하는것이 굉장히 어렵고, 성능을 위한 튜닝이 어렵다.
-             */
-            String jpql2 = "select m.team from Member m";
-            List<Team> resultList2 = em.createQuery(jpql2, Team.class).getResultList();
-            for(Team t : resultList2){
-                System.out.println("t.getName() = " + t.getName());
-            }
-
-            /*
-             * 컬렉션 값 연관 경로도 마찬가지로 묵시적인 내부 조인이 발생한다.
-             * 하지만 이후 탐색을 할 수 없음
-             *  why? 컬렉션에서 어떤 값의 어떤 필드인지를 명시하는 것은 모호함 그래서 하이버네이트는 제약을 걸어둠
-             *  size는 가능
-             */
-            String jpql3 = "select t.members from Team t";
-            List<Collection> resultList3 = em.createQuery(jpql3, Collection.class).getResultList();
-            System.out.println("resultList3 = " + resultList3);
 
             transaction.commit();
         } catch (Exception e) {
