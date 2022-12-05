@@ -172,9 +172,6 @@ public class JpaMain {
 //            em.flush();
 //            em.clear();
 //
-//            /*
-//             * 즉시 로딩으로 설정하면 JPQL 사용할 때, N+1 문제 발생, 1번의 쿼리에 결과에 각각 SELECT 쿼리 (조회결과 N개에 각각 그래서 N+1 문제)
-//             */
 //            List<Member> resultList = em.createQuery("select m from Member m", Member.class).getResultList();
 //
 //
