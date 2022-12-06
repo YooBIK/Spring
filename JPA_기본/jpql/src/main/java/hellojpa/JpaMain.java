@@ -268,77 +268,86 @@ public class JpaMain {
 //            List<Collection> resultList3 = em.createQuery(jpql3, Collection.class).getResultList();
 //            System.out.println("resultList3 = " + resultList3);
 
+//            /*
+//            * Fetch Join # 굉장히 중요함!!
+//            * - JPQL에서 성능 최적화를 위해 제공하는 기능(SQL에는 존재하지 않음)
+//            * - 연관된 엔티티와 컬렉션을 SQL 한번으로 함께 조회하는 기능
+//            * - N + 1 문제를 해결하는 방법
+//             */
+//
+//            Team teamA = new Team();
+//            teamA.setName("teamA");
+//            em.persist(teamA);
+//
+//            Team teamB = new Team();
+//            teamB.setName("teamB");
+//            em.persist(teamB);
+//
+//            Member member1 = new Member();
+//            member1.setUserName("member1");
+//            member1.setTeam(teamA);
+//            em.persist(member1);
+//
+//            Member member2 = new Member();
+//            member2.setUserName("member2");
+//            member2.setTeam(teamA);
+//            em.persist(member2);
+//
+//            Member member3 = new Member();
+//            member3.setUserName("member3");
+//            member3.setTeam(teamB);
+//            em.persist(member3);
+//
+//
+//            em.flush();
+//            em.clear();
+//
+//            /*
+//            * 지연 로딩으로 설정했지만, N+1문제 발생!
+//            *   resultList의 각 Member 객체마다 Team의 정보를 요청
+//             */
+//            String jpql = "select m from Member m";
+//            List<Member> resultList1 = em.createQuery(jpql, Member.class).getResultList();
+//            for(Member m : resultList1){
+//                System.out.println("member = " + m.getUserName() + ", " + m.getTeam().getName());
+//            }
+//
+//            em.clear();
+//
+//            /*
+//            * fetch join을 사용하면 member의 team도 join을 통해 함께 영속성 컨텍스트로 가져옴
+//            * 즉, Team 객체는 프록시가 아닌 실제 영속 엔티티임
+//             */
+//            String fetchJoinJpql1 = "select m from Member m join fetch m.team";
+//            List<Member> resultList2 = em.createQuery(fetchJoinJpql1, Member.class).getResultList();
+//            for(Member m : resultList2){
+//                System.out.println("member = " + m.getUserName() + ", " + m.getTeam().getName());
+//            }
+//
+//            /*
+//             * 컬렉션도 fetch join 할 수 있음 // 하나의 컬렉션만 페치 조인 가능하다 !!
+//             * DB 관점에서는 한 팀에 여러 멤버가 있으면, 여러 행으로 표현하는 방법 밖에 없다.
+//             *  ex) 한 팀에 소속된 회원이 3명이면 SQL의 결과는 3줄이 나온다. 그렇기에 JPQL의 결과인 resultList3의 크기는 3이 나온다!!
+//             *  -> distinct를 사용
+//             *          - SQL의 DINTINCT와 함께 중복된(같은 식별자를 가진) 엔티티도 제거한다.
+//             */
+//            String fetchJoinJpql2 = "select DISTINCT t from Team t join fetch t.members";
+//            List<Team> resultList3 = em.createQuery(fetchJoinJpql2, Team.class).getResultList();
+//            for(Team t : resultList3){
+//                System.out.println("t.getName() = " + t.getName());
+//                for(Member m : t.getMembers()){
+//                    System.out.println("m = " + m);
+//                }
+//            }
+
             /*
-            * Fetch Join # 굉장히 중요함!!
-            * - JPQL에서 성능 최적화를 위해 제공하는 기능(SQL에는 존재하지 않음)
-            * - 연관된 엔티티와 컬렉션을 SQL 한번으로 함께 조회하는 기능
-            * - N + 1 문제를 해결하는 방법
+            * 다형성 쿼리
+            * - 상속 관계 맵핑을 했을 때
+            *       TYPE 명령어를 써서 특정 자식만 조회할 수 있음
+            *       TREAT 명령어를 사용해 특정 자식 타입으로 변환해서 받을 수 있음(다운캐스팅과 유사함)
              */
 
-            Team teamA = new Team();
-            teamA.setName("teamA");
-            em.persist(teamA);
 
-            Team teamB = new Team();
-            teamB.setName("teamB");
-            em.persist(teamB);
-
-            Member member1 = new Member();
-            member1.setUserName("member1");
-            member1.setTeam(teamA);
-            em.persist(member1);
-
-            Member member2 = new Member();
-            member2.setUserName("member2");
-            member2.setTeam(teamA);
-            em.persist(member2);
-
-            Member member3 = new Member();
-            member3.setUserName("member3");
-            member3.setTeam(teamB);
-            em.persist(member3);
-
-
-            em.flush();
-            em.clear();
-
-            /*
-            * 지연 로딩으로 설정했지만, N+1문제 발생!
-            *   resultList의 각 Member 객체마다 Team의 정보를 요청
-             */
-            String jpql = "select m from Member m";
-            List<Member> resultList1 = em.createQuery(jpql, Member.class).getResultList();
-            for(Member m : resultList1){
-                System.out.println("member = " + m.getUserName() + ", " + m.getTeam().getName());
-            }
-
-            em.clear();
-
-            /*
-            * fetch join을 사용하면 member의 team도 join을 통해 함께 영속성 컨텍스트로 가져옴
-            * 즉, Team 객체는 프록시가 아닌 실제 영속 엔티티임
-             */
-            String fetchJoinJpql1 = "select m from Member m join fetch m.team";
-            List<Member> resultList2 = em.createQuery(fetchJoinJpql1, Member.class).getResultList();
-            for(Member m : resultList2){
-                System.out.println("member = " + m.getUserName() + ", " + m.getTeam().getName());
-            }
-
-            /*
-             * 컬렉션도 fetch join 할 수 있음 // 하나의 컬렉션만 페치 조인 가능하다 !!
-             * DB 관점에서는 한 팀에 여러 멤버가 있으면, 여러 행으로 표현하는 방법 밖에 없다.
-             *  ex) 한 팀에 소속된 회원이 3명이면 SQL의 결과는 3줄이 나온다. 그렇기에 JPQL의 결과인 resultList3의 크기는 3이 나온다!!
-             *  -> distinct를 사용
-             *          - SQL의 DINTINCT와 함께 중복된(같은 식별자를 가진) 엔티티도 제거한다.
-             */
-            String fetchJoinJpql2 = "select DISTINCT t from Team t join fetch t.members";
-            List<Team> resultList3 = em.createQuery(fetchJoinJpql2, Team.class).getResultList();
-            for(Team t : resultList3){
-                System.out.println("t.getName() = " + t.getName());
-                for(Member m : t.getMembers()){
-                    System.out.println("m = " + m);
-                }
-            }
 
             transaction.commit();
         } catch (Exception e) {
