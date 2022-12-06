@@ -340,20 +340,20 @@ public class JpaMain {
 //                }
 //            }
 
-            /*
-            * 다형성 쿼리
-            * - 상속 관계 맵핑을 했을 때
-            *       TYPE 명령어를 써서 특정 자식만 조회할 수 있음
-            *       TREAT 명령어를 사용해 특정 자식 타입으로 변환해서 받을 수 있음(다운캐스팅과 유사함)
-             */
+//            /*
+//            * 다형성 쿼리
+//            * - 상속 관계 맵핑을 했을 때
+//            *       TYPE 명령어를 써서 특정 자식만 조회할 수 있음
+//            *       TREAT 명령어를 사용해 특정 자식 타입으로 변환해서 받을 수 있음(다운캐스팅과 유사함)
+//             */
 
-            /*
-            * 엔티티를 직접 사용
-            * - where절에 m으로 조건을 걸든 m.id로 걸든 SQL은 m.id로 나간다.
-            * - 결국 DB에선 식별자로 조회해야하니까 엔티티를 직접써도 ID로 조회
-            * - 외래키의 경우도 마찬가지, 엔티티를 직접 사용하면 결국 관련 식별자로 SQL이 나간다.
-             */
-
+//            /*
+//            * 엔티티를 직접 사용
+//            * - where절에 m으로 조건을 걸든 m.id로 걸든 SQL은 m.id로 나간다.
+//            * - 결국 DB에선 식별자로 조회해야하니까 엔티티를 직접써도 ID로 조회
+//            * - 외래키의 경우도 마찬가지, 엔티티를 직접 사용하면 결국 관련 식별자로 SQL이 나간다.
+//             */
+//
             Team teamA = new Team();
             teamA.setName("teamA");
 
@@ -382,25 +382,38 @@ public class JpaMain {
             em.persist(memberB);
             em.persist(memberC);
 
-
             em.flush();
             em.clear();
+//
+//            String jpql = "select m from Member m where m =: member";
+//            List<Member> resultList = em.createQuery(jpql, Member.class)
+//                    .setParameter("member",memberA)
+//                    .getResultList();
+//            for(Member m : resultList){
+//                System.out.println("m = " + m);
+//            }
+//
+//            String jpql2 = "select m from Member m where m.team =: team";
+//            List<Member> result = em.createQuery(jpql2, Member.class)
+//                    .setParameter("team", memberA.getTeam())
+//                    .getResultList();
+//            for (Member member1 : result) {
+//                System.out.println("member1 = " + member1);
+//            }
 
-            String jpql = "select m from Member m where m =: member";
-            List<Member> resultList = em.createQuery(jpql, Member.class)
-                    .setParameter("member",memberA)
-                    .getResultList();
-            for(Member m : resultList){
-                System.out.println("m = " + m);
-            }
+            /*
+            * 벌크 연산
+            * 여러 건의 변경이 있을 때, 쿼리 한번으로 처리하는 기법
+            * 쿼리 결과로 영향 받은 로우의 수를 반환
+            * JPA 표준은 update, delete 만 지원
+            * 하이베너테이는 insert into .. select 구문도 지원함
+            * 벌크 연산은 영속성 컨텍스트를 무시하고 DB에 바로 SQL을 날림
+            * 그러니 (1).영속성 컨텍스트를 활용해 작업하기 전에 벌크연산을 먼저 하거나,
+            * (2). 벌크 연산 이후 영속성 컨텍스트를 초기화해주자.
+             */
 
-            String jpql2 = "select m from Member m where m.team =: team";
-            List<Member> result = em.createQuery(jpql2, Member.class)
-                    .setParameter("team", memberA.getTeam())
-                    .getResultList();
-            for (Member member1 : result) {
-                System.out.println("member1 = " + member1);
-            }
+            int count = em.createQuery("update Member m set m.age = 20")
+                    .executeUpdate();
 
             transaction.commit();
         } catch (Exception e) {
