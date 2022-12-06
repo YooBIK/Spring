@@ -347,7 +347,60 @@ public class JpaMain {
             *       TREAT 명령어를 사용해 특정 자식 타입으로 변환해서 받을 수 있음(다운캐스팅과 유사함)
              */
 
+            /*
+            * 엔티티를 직접 사용
+            * - where절에 m으로 조건을 걸든 m.id로 걸든 SQL은 m.id로 나간다.
+            * - 결국 DB에선 식별자로 조회해야하니까 엔티티를 직접써도 ID로 조회
+            * - 외래키의 경우도 마찬가지, 엔티티를 직접 사용하면 결국 관련 식별자로 SQL이 나간다.
+             */
 
+            Team teamA = new Team();
+            teamA.setName("teamA");
+
+            Team teamB = new Team();
+            teamB.setName("teamB");
+
+            em.persist(teamA);
+            em.persist(teamB);
+
+            Member memberA = new Member();
+            memberA.setUserName("memberA");
+            memberA.setTeam(teamA);
+            memberA.setAge(10);
+
+            Member memberB = new Member();
+            memberB.setUserName("memberB");
+            memberB.setTeam(teamA);
+            memberB.setAge(10);
+
+            Member memberC = new Member();
+            memberC.setUserName("memberC");
+            memberC.setTeam(teamB);
+            memberC.setAge(10);
+
+            em.persist(memberA);
+            em.persist(memberB);
+            em.persist(memberC);
+
+
+            em.flush();
+            em.clear();
+
+            String jpql = "select m from Member m where m =: member";
+            List<Member> resultList = em.createQuery(jpql, Member.class)
+                    .setParameter("member",memberA)
+                    .getResultList();
+            for(Member m : resultList){
+                System.out.println("m = " + m);
+            }
+
+            String jpql2 = "select m from Member m where m.team =: team";
+            List<Member> result = em.createQuery(jpql2, Member.class)
+                    .setParameter("team", memberA.getTeam())
+                    .getResultList();
+            for (Member member1 : result) {
+                System.out.println("member1 = " + member1);
+            }
 
             transaction.commit();
         } catch (Exception e) {
