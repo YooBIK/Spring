@@ -32,7 +32,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .formLogin() // formLogin 형식
                 .loginPage("/loginForm")        // Login Page의 url 설정
                 .loginProcessingUrl("/login")   // "/login" 주소가 호출되면, Spring Security 가 낚아채서 대신 로그인을 진행한다.
-                .defaultSuccessUrl("/");        // loginForm -> 로그인 -> defaultUrl , 특정 주소 -> 로그인 -> 특정 주소
+                .defaultSuccessUrl("/")         // loginForm -> 로그인 -> defaultUrl , 특정 주소 -> 로그인 -> 특정 주소
+                .and()
+                .oauth2Login() // OAuth 로그인 설정
+                .loginPage("/loginForm"); // 이 부분은 무슨 역할일까..?  // 구글 로그인 이후 처리 필요!!
 
     }
 }
