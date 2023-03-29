@@ -3,6 +3,8 @@ package com.security1.springsecurity1.controller;
 import com.security1.springsecurity1.model.User;
 import com.security1.springsecurity1.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -89,6 +91,22 @@ public class IndexController {
         userRepository.save(user);  // 회원 가입 성공 BUT 비밀번호가 암호화 되어있지 않아 Spring Security로 Login 할 수 없음
         return "redirect:/loginForm";
     }
+
+    @GetMapping("/info")
+    @ResponseBody
+    @Secured("ROLE_ADMIN")  // 특정 메서드에 접근할 수 있는 권한을 설정
+    public String info(){
+        return "개인정보";
+    }
+
+    @GetMapping("/data")
+    @ResponseBody
+    // 메서드 호출 권한 설정 , 메서드 호출 직전에 권한을 체크한다.
+    @PreAuthorize("hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
+    public String data(){
+        return "데이터 정보";
+    }
+
 
 
 }

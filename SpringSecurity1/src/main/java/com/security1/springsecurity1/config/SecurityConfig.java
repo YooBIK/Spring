@@ -2,6 +2,7 @@ package com.security1.springsecurity1.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -9,6 +10,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Configuration
 @EnableWebSecurity  // Spring Security Filter가 Spring Filter Chain에 등록된다.
+// securedEnabled : @Secured 활성화 여부
+// prePostEnabled : @PreAuthorize , @PostAuthorize 애노테이션 활성화 여부
+@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     // 해당 메서드의 리턴되는 Object를 Spring Container에 등록
